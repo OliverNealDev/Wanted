@@ -99,6 +99,7 @@ GameObject:
   - component: {fileID: 7506924418891146121}
   - component: {fileID: 1131159738148354059}
   - component: {fileID: 8015216518707894448}
+  - component: {fileID: 5302259543871851532}
   m_Layer: 0
   m_Name: treeStump
   m_TagString: Untagged
@@ -239,6 +240,22 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
+--- !u!114 &5302259543871851532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3420156286463289681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9809bf1345abc5648af68b3a82653f08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_OverrideArea: 1
+  m_Area: 1
+  m_IgnoreFromBuild: 0
+  m_AffectedAgents: ffffffff
 --- !u!1 &7876310377142315051
 GameObject:
   m_ObjectHideFlags: 0
@@ -337,7 +354,6 @@ GameObject:
   - component: {fileID: 7165891911172407149}
   - component: {fileID: 2833769646963873505}
   - component: {fileID: 1516216441949942793}
-  - component: {fileID: 8197552237947164096}
   m_Layer: 0
   m_Name: Tree
   m_TagString: Untagged
@@ -412,19 +428,3 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 1
---- !u!208 &8197552237947164096
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9064160595605594635}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 0
-  m_Extents: {x: 0.5, y: 0.5, z: 0.5}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0, z: 0}
-  m_TimeToStationary: 0.5

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NavMeshPlus.Components;
 using UnityEngine;
 
 public class proceduralMap : MonoBehaviour
@@ -6,12 +7,20 @@ public class proceduralMap : MonoBehaviour
     [SerializeField] private GameObject treePrefab;
     private List<GameObject> treeObjects = new List<GameObject>();
     
+    [SerializeField] private NavMeshSurface navMeshSurface;
+    
+    private bool treesBaked = false;
+    
     void Update()
     {
         if (treeObjects.Count < 500)
         {
             GenerateTree();
-            Debug.Log(treeObjects.Count);
+        }
+        else if (treesBaked == false)
+        {
+            treesBaked = true;
+            navMeshSurface.GetComponent<NavMeshSurface>().BuildNavMesh();
         }
     }
 

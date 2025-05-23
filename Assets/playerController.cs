@@ -80,12 +80,25 @@ public class playerController : MonoBehaviour
         
         transform.Translate(_movementInput * (_currentMoveSpeed * Time.deltaTime), Space.World);
         
-        // Player Look at Cursor Logic
+        /* Player Look at Cursor Logic
         Vector2 mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
         Vector2 lookDir = new Vector2(mousePos.x - transform.position.x, mousePos.y - transform.position.y);
         float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg - 90f; // -90f to align sprite's 'up' with cursor
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-        //rb.rotation = angle;
+        rb.rotation = angle;*/
+        
+        // Player Look at Cursor Logic
+        Vector3 mouseScreenPosition = Input.mousePosition;
+        
+        float playerScreenDepth = cam.WorldToScreenPoint(transform.position).z;
+        
+        mouseScreenPosition.z = playerScreenDepth;
+        
+        Vector2 mousePos = cam.ScreenToWorldPoint(mouseScreenPosition);
+        
+        Vector2 lookDir = new Vector2(mousePos.x - transform.position.x, mousePos.y - transform.position.y);
+        float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg - 90f;
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 
     void FixedUpdate()
