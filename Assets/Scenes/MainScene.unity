@@ -104006,71 +104006,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &639375869
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 639375871}
-  - component: {fileID: 639375870}
-  - component: {fileID: 639375872}
-  m_Layer: 0
-  m_Name: GridManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &639375870
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 639375869}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1738a3f53bd4ee542be9a896a5f3e2e5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  unwalkableMask:
-    m_Bits: 0
-  gridWorldSize: {x: 100, y: 62.6}
-  nodeRadius: 1
-  nodeDiameter: 0
-  gridSizeX: 0
-  gridSizeY: 0
---- !u!4 &639375871
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 639375869}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.6, y: 25.2, z: -1292.1676}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &639375872
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 639375869}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 135e0e5307b64c94c8fe1b7338b428ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gridManager: {fileID: 0}
 --- !u!1 &712723526
 GameObject:
   m_ObjectHideFlags: 0
@@ -104320,9 +104255,6 @@ GameObject:
   - component: {fileID: 1025730062}
   - component: {fileID: 1025730060}
   - component: {fileID: 1025730059}
-  - component: {fileID: 1025730064}
-  - component: {fileID: 1025730065}
-  - component: {fileID: 1025730066}
   m_Layer: 0
   m_Name: policeOfficer
   m_TagString: Player
@@ -104464,67 +104396,6 @@ Transform:
   - {fileID: 219432459}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!195 &1025730064
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1025730058}
-  m_Enabled: 1
-  m_AgentTypeID: 0
-  m_Radius: 0.5
-  m_Speed: 3.5
-  m_Acceleration: 8
-  avoidancePriority: 50
-  m_AngularSpeed: 120
-  m_StoppingDistance: 0
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 1
-  m_BaseOffset: 0.5
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
---- !u!114 &1025730065
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1025730058}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4505d7b2c4e37f488e2968a62921f95, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 522245932}
-  speed: 5
-  targetIndex: 0
-  pathfinder: {fileID: 0}
---- !u!114 &1025730066
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1025730058}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eec086795cd705540be1f22465699de6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentState: 0
-  speed: 3
-  chaseSpeedMultiplier: 1.5
-  detectionRadius: 5
-  minPatrolWaitTime: 2
-  maxPatrolWaitTime: 5
-  playerTag: Player
-  playerTransform: {fileID: 0}
-  pathfinder: {fileID: 0}
-  gridManager: {fileID: 0}
-  currentWaypointIndex: 0
 --- !u!1 &1425685029
 GameObject:
   m_ObjectHideFlags: 0
@@ -104686,4 +104557,3 @@ SceneRoots:
   - {fileID: 1425685033}
   - {fileID: 510961244}
   - {fileID: 290371619}
-  - {fileID: 639375871}
