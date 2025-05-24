@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 public class policeOfficerController : MonoBehaviour
 {
     [Header("Target Settings")]
-    [SerializeField] private Transform target;
+    [SerializeField] private Vector2 target;
 
     [Header("Movement & Rotation")]
     [SerializeField] private float rotationSpeed = 5f;
@@ -39,7 +39,7 @@ public class policeOfficerController : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         agent.updateRotation = false;
         agent.updateUpAxis = false;
-        target = searchNodes.instance.searchNodesList[Random.Range(0, searchNodes.instance.searchNodesList.Count)];
+        target = searchNodes.instance.searchNodesList[Random.Range(0, searchNodes.instance.searchNodesList.Count)].position;
 
         SR = GetComponent<SpriteRenderer>();
         //SR.enabled = false;
@@ -52,14 +52,14 @@ public class policeOfficerController : MonoBehaviour
     {
         if (target == null) return;
 
-        if (Vector2.Distance(transform.position, target.position) > 1f)
+        if (Vector2.Distance(transform.position, target) > 1f)
         {
-            agent.SetDestination(target.position);
+            agent.SetDestination(target);
         }
         else
         {
-            target = searchNodes.instance.searchNodesList[Random.Range(0, searchNodes.instance.searchNodesList.Count)];
-            agent.SetDestination(target.position);
+            target = searchNodes.instance.searchNodesList[Random.Range(0, searchNodes.instance.searchNodesList.Count)].position;
+            agent.SetDestination(target);
         }
 
         HandleSweepingState();
@@ -95,7 +95,7 @@ public class policeOfficerController : MonoBehaviour
 
     void RotateTowardsTargetWithSweep()
     {
-        Vector3 directionToTarget = target.position - transform.position;
+        Vector3 directionToTarget = target - new Vector2(transform.position.x, transform.position.z);
         directionToTarget.z = 0;
 
         float finalAngle;
@@ -133,6 +133,11 @@ public class policeOfficerController : MonoBehaviour
         {
             Invoke("placeProximityMine", Random.Range(minimumCooldownTime * 1f, maximumCooldownTime * 1f));
         }
+    }
+    
+    public void SetTarget(Vector2 newTarget)
+    {
+        target = newTarget;
     }
 
     /*private void OnTriggerEnter2D(Collider2D other)

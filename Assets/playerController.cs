@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -24,6 +25,8 @@ public class playerController : MonoBehaviour
     
     private Camera cam;
     private Vector2 _movementInput;
+    
+    private SpriteRenderer spriteRenderer;
 
     void Start()
     {
@@ -85,7 +88,19 @@ public class playerController : MonoBehaviour
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
     }
 
-    void FixedUpdate()
+    void OnTriggerEnter2D(Collider2D other)
     {
+        if (other.CompareTag("Tree"))
+        {
+            spriteRenderer.color = new Color(1f, 1f, 1f, 0.4f);
+        }
+    }
+    
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Tree"))
+        {
+            spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+        }
     }
 }

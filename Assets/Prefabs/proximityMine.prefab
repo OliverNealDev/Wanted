@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 880746467725496952}
   - component: {fileID: 100664869200163724}
   - component: {fileID: 1019476017582972199}
+  - component: {fileID: 5879300276387271877}
   m_Layer: 0
   m_Name: proximityMine
   m_TagString: Untagged
@@ -149,7 +150,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 10.13
-  MaxDistance: 11.13
+  MaxDistance: 12.13
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0
@@ -290,3 +291,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pMineOnSprite: {fileID: 21300000, guid: b4076934a39a168498aa09ce3f14113c, type: 3}
   pMineOffSprite: {fileID: 21300000, guid: e512cf0b1d501c64db817f71def39aef, type: 3}
+  proximityRadius: 3
+  alertSound: {fileID: 8300000, guid: 619ecfb662445a14aafa4754020f2068, type: 3}
+  beepSound: {fileID: 8300000, guid: ec673776a3f0b094aa6f07de82f26196, type: 3}
+--- !u!58 &5879300276387271877
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2056279179789386527}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 512
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 183
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 3

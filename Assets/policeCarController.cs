@@ -14,9 +14,13 @@ public class policeCarController : MonoBehaviour
     private bool isDriving = true;
     private bool disbandedOfficers = false;
     private Vector2 currentVelocity = Vector2.zero;
+    
+    [SerializeField] private lawEnforcementManager lawEnforcementManager;
 
     void Start()
     {
+        lawEnforcementManager = FindObjectOfType<lawEnforcementManager>();
+        
         targetPosition = new Vector2(Random.Range(-30f, 30f), transform.position.y);
         randomEntrance = Random.Range(0, 2) == 0;
 
@@ -65,10 +69,14 @@ public class policeCarController : MonoBehaviour
         else if (!disbandedOfficers)
         {
             disbandedOfficers = true;
-            for (int i = 0; i < 4; i++)
+            /*for (int i = 0; i < 4; i++)
             {
                 Instantiate(policeOfficerPrefab, transform.position + new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0), Quaternion.identity);
-            }
+            }*/
+            lawEnforcementManager.SpawnPoliceOfficer(transform.position + new Vector3(-1, 2, 0));
+            lawEnforcementManager.SpawnPoliceOfficer(transform.position + new Vector3(-1, -2, 0));
+            lawEnforcementManager.SpawnPoliceOfficer(transform.position + new Vector3(-1, 2, 0));
+            lawEnforcementManager.SpawnPoliceOfficer(transform.position + new Vector3(1, -2, 0));
         }
     }
 

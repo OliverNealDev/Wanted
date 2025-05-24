@@ -302,7 +302,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4815ef44ab3573247ae3a6601666c3b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {x: 0, y: 0}
   rotationSpeed: 5
   minSweepInterval: 3
   maxSweepInterval: 10
@@ -311,8 +311,8 @@ MonoBehaviour:
   sweepOscillationSpeed: 1
   proximityMinePrefab: {fileID: 2056279179789386527, guid: 6a23936785953b94686667989dcff81a, type: 3}
   proximityMineCount: 1
-  minimumCooldownTime: 5
-  maximumCooldownTime: 10
+  minimumCooldownTime: 30
+  maximumCooldownTime: 90
 --- !u!195 &8087418043640440310
 NavMeshAgent:
   m_ObjectHideFlags: 0
