@@ -5,11 +5,15 @@ public class lawEnforcementManager : MonoBehaviour
     [SerializeField] private GameObject policeCarPrefab;
     [SerializeField] private Vector2 policeCarSpawnPoint;
     
+    [SerializeField] private GameObject policeHelicopterPrefab;
+    [SerializeField] private Vector2 policeHelicopterSpawnPoint;
+    
     [SerializeField] private GameObject policeOfficerPrefab;
     
     void Start()
     {
         InvokeRepeating("SpawnPoliceCar", 1f, 20f);
+        InvokeRepeating("SpawnPoliceHelicopter", 1f, 30f);
     }
     
     void Update()
@@ -25,5 +29,10 @@ public class lawEnforcementManager : MonoBehaviour
     void SpawnPoliceOfficer(Vector3 position)
     {
         Instantiate(policeOfficerPrefab, position, Quaternion.identity);
+    }
+    
+    void SpawnPoliceHelicopter()
+    {
+        Instantiate(policeHelicopterPrefab, policeHelicopterSpawnPoint, Quaternion.identity);
     }
 }
