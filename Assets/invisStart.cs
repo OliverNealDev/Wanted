@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class barrier : MonoBehaviour
+public class invisStart : MonoBehaviour
 {
     void Start()
     {

@@ -3,12 +3,14 @@ using UnityEngine;
 
 public class autoBake : MonoBehaviour
 {
+    public static autoBake instance;
+    
     void Start()
     {
-        //InvokeRepeating("Bake", 0, 10f);
+        instance = this;
     }
     
-    void Bake()
+    public void Bake()
     {
         GetComponent<NavMeshSurface>().BuildNavMesh();
     }
