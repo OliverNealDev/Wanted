@@ -13,7 +13,7 @@ public class lawEnforcementManager : MonoBehaviour
     void Start()
     {
         InvokeRepeating("SpawnPoliceCar", 1f, 20f);
-        InvokeRepeating("SpawnPoliceHelicopter", 1f, 30f);
+        InvokeRepeating("SpawnPoliceHelicopter", 30f, 45f);
     }
     
     void Update()

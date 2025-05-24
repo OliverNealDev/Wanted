@@ -1,6 +1,9 @@
+using System;
 using NavMeshPlus.Components;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Serialization;
+using Random = UnityEngine.Random;
 
 public class policeOfficerController : MonoBehaviour
 {
@@ -17,11 +20,19 @@ public class policeOfficerController : MonoBehaviour
     [SerializeField] private float maxSweepAngle = 20f;
     [SerializeField] private float sweepOscillationSpeed = 1.5f;
 
+    [Header("Equipment Settings")] [SerializeField]
+    private GameObject proximityMinePrefab;
+    [SerializeField] private int proximityMineCount = 1;
+    [SerializeField] private float minimumCooldownTime = 30f;
+    [SerializeField] private float maximumCooldownTime = 90f;
+
     NavMeshAgent agent;
 
     private float nextSweepTimer;
     private bool isCurrentlySweeping = false;
     private float currentSweepActiveTime;
+
+    private SpriteRenderer SR;
 
     void Start()
     {
@@ -30,7 +41,11 @@ public class policeOfficerController : MonoBehaviour
         agent.updateUpAxis = false;
         target = searchNodes.instance.searchNodesList[Random.Range(0, searchNodes.instance.searchNodesList.Count)];
 
+        SR = GetComponent<SpriteRenderer>();
+        //SR.enabled = false;
+        
         SetNewSweepInterval();
+        Invoke("placeProximityMine", Random.Range(minimumCooldownTime * 1f, maximumCooldownTime * 1f));
     }
 
     void Update()
@@ -105,4 +120,34 @@ public class policeOfficerController : MonoBehaviour
         Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, finalAngle));
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
+    
+    private void placeProximityMine()
+    {
+        if (proximityMinePrefab != null && proximityMineCount > 0)
+        {
+            Vector2 minePosition = transform.position + new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0);
+            Instantiate(proximityMinePrefab, minePosition, Quaternion.identity);
+            proximityMineCount--;
+        }
+        if (proximityMineCount > 0)
+        {
+            Invoke("placeProximityMine", Random.Range(minimumCooldownTime * 1f, maximumCooldownTime * 1f));
+        }
+    }
+
+    /*private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player") && !SR.enabled)
+        {
+            SR.enabled = true;
+        }
+    }
+    
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Player") && SR.enabled)
+        {
+            SR.enabled = false;
+        }
+    }*/
 }

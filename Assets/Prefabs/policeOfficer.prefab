@@ -309,6 +309,10 @@ MonoBehaviour:
   sweepDuration: 6
   maxSweepAngle: 45
   sweepOscillationSpeed: 1
+  proximityMinePrefab: {fileID: 2056279179789386527, guid: 6a23936785953b94686667989dcff81a, type: 3}
+  proximityMineCount: 1
+  minimumCooldownTime: 5
+  maximumCooldownTime: 10
 --- !u!195 &8087418043640440310
 NavMeshAgent:
   m_ObjectHideFlags: 0
