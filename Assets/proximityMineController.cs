@@ -4,112 +4,150 @@ using System.Collections;
 
 public class proximityMineController : MonoBehaviour
 {
+    [Header("Sprite Settings")]
     [SerializeField] private Sprite pMineOnSprite;
     [SerializeField] private Sprite pMineOffSprite;
     private SpriteRenderer SR;
-    
+
+    [Header("Proximity Settings")]
     [SerializeField] private float proximityRadius = 1f;
     private GameObject player;
 
-    private Light2D light;
-    private AudioSource audio;
-    
-    private bool isLit = false;
-    private bool isAlerting = false;
+    [Header("Light Settings")]
+    private Light2D mineLight;
+    private float baseLightIntensity;
+    private float baseLightOuterRadius;
 
+    [Header("Audio Settings")]
     [SerializeField] private AudioClip alertSound;
     [SerializeField] private AudioClip beepSound;
+    private AudioSource audioSource;
+
+    [Header("State & Behavior")]
+    [Tooltip("Alpha the mine resets to if visible after an alert sequence.")]
+    [SerializeField] private float defaultAlphaAfterReset = 0.75f; 
+    private bool isLit = false;
+    private bool isAlerting = false;
     
     private lawEnforcementManager lawEnforcementManager;
-
     private Coroutine activeFadeCoroutine;
 
     void Start()
     {
         lawEnforcementManager = FindObjectOfType<lawEnforcementManager>();
         player = GameObject.FindGameObjectWithTag("Player");
+        
         SR = GetComponent<SpriteRenderer>();
-        light = GetComponent<Light2D>();
-        audio = GetComponent<AudioSource>();
+        mineLight = GetComponent<Light2D>();
+        audioSource = GetComponent<AudioSource>();
+
+        baseLightIntensity = mineLight.intensity;
+        baseLightOuterRadius = mineLight.pointLightOuterRadius;
         
         SR.sprite = pMineOffSprite;
-        light.enabled = false;
+        SR.color = new Color(SR.color.r, SR.color.g, SR.color.b, 0f); 
+        SR.enabled = false; 
+
+        mineLight.intensity = 0f;
+        mineLight.enabled = false;
         
-        InvokeRepeating("ToggleLight", 0.5f, 0.5f);
-        InvokeRepeating("checkProximityToPlayer", 0.5f, 0.5f);
+        InvokeRepeating("ToggleBeepingState", 0.5f, 0.5f); 
+        InvokeRepeating("CheckProximityToPlayer", 0.5f, 0.5f);
     }
     
-    void ToggleLight()
+    void ToggleBeepingState() 
     {
-        if (isAlerting) return;
+        if (isAlerting) return; 
         
         isLit = !isLit;
         
         if (isLit)
         {
-            audio.Play();
+            audioSource.clip = beepSound;
+            audioSource.Play();
         }
         else
         {
-            audio.Stop();
+            audioSource.Stop();
         }
         
-        Invoke("litVisualDelay", 0.2f);
+        Invoke("UpdateBlinkingVisuals", 0.2f);
     }
     
-    private void litVisualDelay()
+    private void UpdateBlinkingVisuals()
     {
-        if (isAlerting) return;
+        if (isAlerting || activeFadeCoroutine != null || !SR.enabled) return;
         
         SR.sprite = isLit ? pMineOnSprite : pMineOffSprite;
+        mineLight.enabled = isLit;
 
-        if (SR.enabled) 
+        if (isLit)
         {
-            light.enabled = isLit;
+            mineLight.intensity = baseLightIntensity;
+            mineLight.pointLightOuterRadius = baseLightOuterRadius;
         }
         else
         {
-            light.enabled = false;
+            mineLight.intensity = 0f; 
         }
     }
     
-    private void checkProximityToPlayer()
+    private void CheckProximityToPlayer()
     {
-        if (player == null) return;
+        if (player == null || isAlerting) return;
 
-        if (Vector2.Distance(transform.position, player.transform.position) <= proximityRadius && isAlerting == false)
+        if (Vector2.Distance(transform.position, player.transform.position) <= proximityRadius)
         {
             if (activeFadeCoroutine != null)
             {
                 StopCoroutine(activeFadeCoroutine);
-                activeFadeCoroutine = null;
+                activeFadeCoroutine = null; 
             }
 
             isAlerting = true;
-            SR.enabled = true;
-            SR.sprite = pMineOnSprite;
-            light.enabled = true;
-            light.intensity *= 10f;
-            light.pointLightOuterRadius *= 3f;
-            SR.color = new Color(SR.color.r, SR.color.g, SR.color.b, 1f);
+            SR.sprite = pMineOnSprite; 
+            SR.color = new Color(SR.color.r, SR.color.g, SR.color.b, 1f); 
             
-            audio.clip = alertSound;
-            audio.Play();
-            lawEnforcementManager.AlertSpottedTransform(new Vector2(transform.position.x, transform.position.y));
-            Invoke("Reset", 5f);
+            if(!SR.enabled) SR.enabled = true;
+
+            mineLight.enabled = true;
+            mineLight.intensity = baseLightIntensity * 3f;
+            mineLight.pointLightOuterRadius = baseLightOuterRadius * 3f;
+            
+            audioSource.Stop(); 
+            audioSource.clip = alertSound;
+            audioSource.Play();
+
+            if (lawEnforcementManager != null)
+            {
+                lawEnforcementManager.AlertSpottedTransform(new Vector2(transform.position.x, transform.position.y));
+            }
+            Invoke("ResetMineState", 5f);
         }
     }
     
-    private void Reset()
+    private void ResetMineState()
     {
         isAlerting = false;
-        audio.clip = beepSound;
-        light.intensity /= 10f;
-        light.pointLightOuterRadius /= 3f;
-        SR.color = new Color(SR.color.r, SR.color.g, SR.color.b, 0.75f); 
+        audioSource.Stop(); 
+        audioSource.clip = beepSound; 
+        
+        SR.sprite = isLit ? pMineOnSprite : pMineOffSprite;
+        mineLight.enabled = isLit;
+        if (isLit)
+        {
+            mineLight.intensity = baseLightIntensity;
+            mineLight.pointLightOuterRadius = baseLightOuterRadius;
+        }
+        else
+        {
+            mineLight.intensity = 0f;
+            mineLight.pointLightOuterRadius = baseLightOuterRadius; 
+        }
 
-        if (player != null && SR.enabled) {
-             light.enabled = isLit;
+        if (SR.enabled) 
+        {
+            SR.color = new Color(SR.color.r, SR.color.g, SR.color.b, defaultAlphaAfterReset); 
         }
     }
     
@@ -121,7 +159,7 @@ public class proximityMineController : MonoBehaviour
             {
                 StopCoroutine(activeFadeCoroutine);
             }
-            SR.enabled = true;
+            SR.enabled = true; 
             activeFadeCoroutine = StartCoroutine(FadeMineVisuals(true, 0.25f));
         }
     }
@@ -130,7 +168,7 @@ public class proximityMineController : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            if (!isAlerting)
+            if (!isAlerting) 
             {
                 if (activeFadeCoroutine != null)
                 {
@@ -144,60 +182,73 @@ public class proximityMineController : MonoBehaviour
     private IEnumerator FadeMineVisuals(bool fadeIn, float duration)
     {
         float timer = 0f;
-        
-        Color currentSpriteColor = SR.color;
-        float startSpriteAlpha = SR.color.a;
-        float targetSpriteAlpha = fadeIn ? 1f : 0f;
+        Color initialSpriteColorForLerp = SR.color; 
+        float startSpriteAlpha = SR.color.a;       
+        float targetSpriteAlpha;
 
-        float startLightIntensity = light.intensity;
-        float targetLightIntensity = 0f;
-        bool finalLightEnabledState = false;
+        float lightFadeOut_StartIntensity = 0f;
+        float lightFadeOut_StartRadius = 0f;
+        bool lightWasEnabledForFadeOut = false;
 
         if (fadeIn)
         {
+            targetSpriteAlpha = 1f;
+
             if (isAlerting)
             {
-                finalLightEnabledState = true;
-                targetLightIntensity = light.intensity; 
+                mineLight.enabled = true;
+                mineLight.intensity = baseLightIntensity * 3f;
+                mineLight.pointLightOuterRadius = baseLightOuterRadius * 3f;
             }
-            else if (isLit)
+            else if (isLit) 
             {
-                finalLightEnabledState = true;
-                targetLightIntensity = light.intensity;
+                mineLight.enabled = true;
+                mineLight.intensity = baseLightIntensity;
+                mineLight.pointLightOuterRadius = baseLightOuterRadius;
             }
-
-            if (finalLightEnabledState && !light.enabled) {
-                light.enabled = true;
+            else 
+            {
+                mineLight.enabled = false;
+                mineLight.intensity = 0f;
             }
         }
-        else
+        else 
         {
-            targetLightIntensity = 0f;
-            finalLightEnabledState = false;
+            targetSpriteAlpha = 0f;
+
+            lightWasEnabledForFadeOut = mineLight.enabled;
+            if (lightWasEnabledForFadeOut)
+            {
+                lightFadeOut_StartIntensity = mineLight.intensity;
+                lightFadeOut_StartRadius = mineLight.pointLightOuterRadius;
+            }
         }
-        
+
         while (timer < duration)
         {
             timer += Time.deltaTime;
             float progress = Mathf.Clamp01(timer / duration);
 
-            SR.color = new Color(currentSpriteColor.r, currentSpriteColor.g, currentSpriteColor.b, Mathf.Lerp(startSpriteAlpha, targetSpriteAlpha, progress));
-            
-            if (light.enabled || (fadeIn && finalLightEnabledState))
+            SR.color = new Color(initialSpriteColorForLerp.r, initialSpriteColorForLerp.g, initialSpriteColorForLerp.b, Mathf.Lerp(startSpriteAlpha, targetSpriteAlpha, progress));
+
+            if (!fadeIn && lightWasEnabledForFadeOut) 
             {
-                light.intensity = Mathf.Lerp(startLightIntensity, targetLightIntensity, progress);
+                mineLight.intensity = Mathf.Lerp(lightFadeOut_StartIntensity, 0f, progress);
+                mineLight.pointLightOuterRadius = Mathf.Lerp(lightFadeOut_StartRadius, 0f, progress);
             }
             yield return null;
         }
 
-        SR.color = new Color(currentSpriteColor.r, currentSpriteColor.g, currentSpriteColor.b, targetSpriteAlpha);
-        light.intensity = targetLightIntensity;
-        light.enabled = finalLightEnabledState;
+        SR.color = new Color(initialSpriteColorForLerp.r, initialSpriteColorForLerp.g, initialSpriteColorForLerp.b, targetSpriteAlpha);
 
-        if (!fadeIn)
+        if (!fadeIn) 
         {
+            mineLight.intensity = 0f;
+            mineLight.pointLightOuterRadius = 0f; 
+            mineLight.enabled = false;
             SR.enabled = false;
         }
+        
         activeFadeCoroutine = null;
     }
 }
