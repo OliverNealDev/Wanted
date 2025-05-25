@@ -7,6 +7,7 @@ TagManager:
   - Barrier
   - policeOfficer
   - Tree
+  - berryBush
   layers:
   - Default
   - TransparentFX

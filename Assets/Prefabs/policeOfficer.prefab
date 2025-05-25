@@ -313,6 +313,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {x: 0, y: 0}
   rotationSpeed: 5
+  patrolSpeed: 3
+  chaseSpeed: 4
   minSweepInterval: 3
   maxSweepInterval: 10
   sweepDuration: 6

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 public class playerController : MonoBehaviour
 {
@@ -9,11 +10,12 @@ public class playerController : MonoBehaviour
     private float _currentMoveSpeed;
     
     [SerializeField] private float walkSpeed = 5f;
-    [SerializeField] private float sprintSpeedMultiplier = 1.5f;
-    [SerializeField] private float maxStamina = 100f;
-    [SerializeField] private float staminaRegenRate = 5f;
-    [SerializeField] private float staminaDrainRate = 10f;
-    private float _currentStamina = 5f;
+    [SerializeField] private float sprintSpeedMultiplier = 2f;
+    [SerializeField] private float maxStamina = 1f;
+    //[SerializeField] private float staminaRegenRate = 5f;
+    [SerializeField] private float staminaDrainRate = 1f;
+    [SerializeField] private float _currentStamina = 0.5f;
+    [SerializeField] private Slider staminaSlider;
     
     [SerializeField] private float turnSpeed = 5f;
     
@@ -29,13 +31,14 @@ public class playerController : MonoBehaviour
     
     private SpriteRenderer spriteRenderer;
     
-    private List<GameObject> TreesUnder = new List<GameObject>();
+    private List<GameObject> foliageUnder = new List<GameObject>();
 
     void Start()
     {
-        _currentStamina = maxStamina;
+        //_currentStamina = maxStamina;
         cam = Camera.main;
         spriteRenderer = GetComponent<SpriteRenderer>();
+        staminaSlider.value = _currentStamina;
     }
 
     void Update()
@@ -44,14 +47,16 @@ public class playerController : MonoBehaviour
         {
             _currentMoveSpeed = walkSpeed * sprintSpeedMultiplier;
             _currentStamina -= staminaDrainRate * Time.deltaTime;
+            staminaSlider.value = _currentStamina;
         }
         else
         {
             _currentMoveSpeed = walkSpeed;
-            if (_currentStamina < maxStamina)
+            /*if (_currentStamina < maxStamina)
             {
                 _currentStamina += staminaRegenRate * Time.deltaTime;
-            }
+                staminaSlider.value = _currentStamina / maxStamina;
+            }*/
         }
         
         _currentStamina = Mathf.Clamp(_currentStamina, 0, maxStamina);
@@ -80,6 +85,27 @@ public class playerController : MonoBehaviour
         }
         
         transform.Translate(_movementInput * (_currentMoveSpeed * Time.deltaTime), Space.World);
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            bool isUnderBerryBush = false;
+            GameObject bushUnder = null;
+            foreach (GameObject foliageUnder in foliageUnder)
+            {
+                if (foliageUnder.CompareTag("berryBush"))
+                {
+                    isUnderBerryBush = true;
+                    bushUnder = foliageUnder;
+                }
+            }
+
+            if (isUnderBerryBush)
+            {
+                _currentStamina += 0.2f;
+                bushUnder.GetComponent<bushController>().onBerriesEaten();
+                staminaSlider.value = _currentStamina / maxStamina;
+            }
+        }
         
         Vector3 mouseScreenPosition = Input.mousePosition;
         float playerScreenDepth = cam.WorldToScreenPoint(transform.position).z;
@@ -94,13 +120,13 @@ public class playerController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Tree"))
+        if (other.CompareTag("Tree") || other.CompareTag("berryBush"))
         {
             Debug.Log(other.name);
             
-            if (!TreesUnder.Contains(other.gameObject))
+            if (!foliageUnder.Contains(other.gameObject))
             {
-                TreesUnder.Add(other.gameObject);
+                foliageUnder.Add(other.gameObject);
             }
             spriteRenderer.color = new Color(1f, 1f, 1f, 0.4f);
         }
@@ -108,12 +134,12 @@ public class playerController : MonoBehaviour
     
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Tree"))
+        if (other.CompareTag("Tree") || other.CompareTag("berryBush"))
         {
             Debug.Log("Exited: " + other.name);
             
-            TreesUnder.Remove(other.gameObject);
-            if (TreesUnder.Count == 0)
+            foliageUnder.Remove(other.gameObject);
+            if (foliageUnder.Count == 0)
             {
                 spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
             }
