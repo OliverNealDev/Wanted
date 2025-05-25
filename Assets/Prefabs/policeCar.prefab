@@ -1,5 +1,97 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &713612674244422004
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7743710014186319630}
+  - component: {fileID: 7851699158573483947}
+  m_Layer: 0
+  m_Name: headlights
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7743710014186319630
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 713612674244422004}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 956267075593713395}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7851699158573483947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 713612674244422004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ComponentVersion: 2
+  m_LightType: 1
+  m_BlendStyleIndex: 0
+  m_FalloffIntensity: 1
+  m_Color: {r: 1, g: 1, b: 0.6650944, a: 1}
+  m_Intensity: 1
+  m_LightVolumeIntensity: 1
+  m_LightVolumeEnabled: 0
+  m_ApplyToSortingLayers: 000000005b6aba77
+  m_LightCookieSprite: {fileID: 0}
+  m_DeprecatedPointLightCookieSprite: {fileID: 0}
+  m_LightOrder: 0
+  m_AlphaBlendOnOverlap: 0
+  m_OverlapOperation: 0
+  m_NormalMapDistance: 3
+  m_NormalMapQuality: 2
+  m_UseNormalMap: 0
+  m_ShadowsEnabled: 1
+  m_ShadowIntensity: 0.75
+  m_ShadowSoftness: 0.3
+  m_ShadowSoftnessFalloffIntensity: 0.5
+  m_ShadowVolumeIntensityEnabled: 0
+  m_ShadowVolumeIntensity: 0.75
+  m_LocalBounds:
+    m_Center: {x: 5.79095, y: 0.024650574, z: 0}
+    m_Extent: {x: 30.457249, y: 31.13335, z: 0}
+  m_PointLightInnerAngle: 360
+  m_PointLightOuterAngle: 360
+  m_PointLightInnerRadius: 0
+  m_PointLightOuterRadius: 1
+  m_ShapeLightParametricSides: 5
+  m_ShapeLightParametricAngleOffset: 0
+  m_ShapeLightParametricRadius: 1
+  m_ShapeLightFalloffSize: 26.14
+  m_ShapeLightFalloffOffset: {x: 0, y: 0}
+  m_ShapePath:
+  - {x: 8.954598, y: -4.968307, z: 0}
+  - {x: 9.585726, y: -3.0984235, z: 0}
+  - {x: 10.109561, y: -0.002651453, z: 0}
+  - {x: 9.707153, y: 2.9893394, z: 0}
+  - {x: 8.972825, y: 5.0176015, z: 0}
+  - {x: 1.4736946, y: 1.0264128, z: 0}
+  - {x: 1.7582889, y: 0.80265105, z: 0}
+  - {x: 2.0078006, y: 0.52541614, z: 0}
+  - {x: 2.0262828, y: -0.3709767, z: 0}
+  - {x: 1.8599417, y: -0.7221408, z: 0}
+  - {x: 1.5381892, y: -0.978029, z: 0}
+  - {x: 4.9185023, y: -2.7915735, z: 0}
 --- !u!1 &930849476670321825
 GameObject:
   m_ObjectHideFlags: 0
@@ -15,6 +107,7 @@ GameObject:
   - component: {fileID: 1950922503637746520}
   - component: {fileID: -5444186648729543895}
   - component: {fileID: 9016297718793282256}
+  - component: {fileID: 2840559783903131312}
   m_Layer: 0
   m_Name: policeCar
   m_TagString: Untagged
@@ -37,6 +130,7 @@ Transform:
   m_Children:
   - {fileID: 6334567680673247307}
   - {fileID: 7047302618101541284}
+  - {fileID: 7743710014186319630}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7187961499429948355
@@ -183,6 +277,10 @@ MonoBehaviour:
   maxSpeed: 10
   smoothTime: 0.3
   lawEnforcementManager: {fileID: 0}
+  audioSource: {fileID: 0}
+  siren1Clip: {fileID: 8300000, guid: 35c3c887985256b4bab86f9b94eaf8ae, type: 3}
+  siren2Clip: {fileID: 8300000, guid: 35c3c887985256b4bab86f9b94eaf8ae, type: 3}
+  parkingClip: {fileID: 8300000, guid: 4f5d5750c154bff43ac6a9c8011292ac, type: 3}
 --- !u!114 &-5444186648729543895
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -214,6 +312,103 @@ MonoBehaviour:
   redLight: {fileID: 983047727261730268}
   blueLight: {fileID: 5071004351961538056}
   flashInterval: 0.5
+--- !u!82 &2840559783903131312
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 930849476670321825}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 0.3
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &5589057086703805685
 GameObject:
   m_ObjectHideFlags: 0
@@ -240,7 +435,7 @@ Transform:
   m_GameObject: {fileID: 5589057086703805685}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.03, y: -0.4, z: 0}
+  m_LocalPosition: {x: 0.03, y: 0.47, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -331,7 +526,7 @@ Transform:
   m_GameObject: {fileID: 5648094024365304085}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 1, w: 0}
-  m_LocalPosition: {x: -0.03, y: 0.35, z: 0}
+  m_LocalPosition: {x: 0.03, y: -0.47, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

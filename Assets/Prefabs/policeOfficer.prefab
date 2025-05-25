@@ -313,8 +313,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {x: 0, y: 0}
   rotationSpeed: 5
-  patrolSpeed: 3
-  chaseSpeed: 4
+  patrolSpeed: 2
+  chaseSpeed: 3
   minSweepInterval: 3
   maxSweepInterval: 10
   sweepDuration: 6
@@ -322,8 +322,8 @@ MonoBehaviour:
   sweepOscillationSpeed: 1
   proximityMinePrefab: {fileID: 2056279179789386527, guid: 6a23936785953b94686667989dcff81a, type: 3}
   proximityMineCount: 1
-  minimumCooldownTime: 30
-  maximumCooldownTime: 90
+  minimumCooldownTime: 60
+  maximumCooldownTime: 120
 --- !u!195 &8087418043640440310
 NavMeshAgent:
   m_ObjectHideFlags: 0

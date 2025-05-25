@@ -19,9 +19,16 @@ public class policeCarController : MonoBehaviour
     private Vector2 currentVelocity = Vector2.zero;
     
     [SerializeField] private lawEnforcementManager lawEnforcementManager;
+    
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip siren1Clip;
+    [SerializeField] private AudioClip siren2Clip;
+    [SerializeField] private AudioClip parkingClip;
 
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         lawEnforcementManager = FindObjectOfType<lawEnforcementManager>();
         
         bool randomEntrance = Random.Range(0, 2) == 0;
@@ -43,6 +50,18 @@ public class policeCarController : MonoBehaviour
             initialTargetPosition = new Vector2(randomTargetX, initialY);
             pullOverTargetPosition = new Vector2(randomTargetX, initialY - pullOverYOffset);
         }
+
+        if (Random.value > 0.5f)
+        {
+            audioSource.clip = siren1Clip;
+        }
+        else
+        {
+            audioSource.clip = siren2Clip;
+        }
+        
+        audioSource.loop = true;
+        audioSource.Play();
     }
 
     void Update()
@@ -116,6 +135,14 @@ public class policeCarController : MonoBehaviour
     {
         if (!disbandedOfficers)
         {
+            if (audioSource.isPlaying)
+            {
+                audioSource.Stop();
+            }
+            audioSource.clip = parkingClip;
+            audioSource.loop = false;
+            audioSource.Play();
+            
             disbandedOfficers = true;
             
             float sideSpawnOffset = 1.5f; 
