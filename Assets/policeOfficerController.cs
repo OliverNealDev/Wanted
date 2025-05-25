@@ -36,8 +36,11 @@ public class policeOfficerController : MonoBehaviour
 
     private SpriteRenderer SR;
 
+    private GameObject player;
+
     void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player");
         lawEnforcementManager = FindObjectOfType<lawEnforcementManager>();
         agent = GetComponent<NavMeshAgent>();
         agent.updateRotation = false;
@@ -55,7 +58,16 @@ public class policeOfficerController : MonoBehaviour
     {
         if (target == null) return;
 
-        if (Vector2.Distance(transform.position, target) > 1f)
+        if (Mathf.Approximately(lawEnforcementManager.detectionPercentage, 1) && Vector2.Distance(player.transform.position, transform.position) <= 20f)
+        {
+            target = new Vector2(player.transform.position.x, player.transform.position.y);
+        }
+        
+        if (Vector2.Distance(transform.position, target) > 3f && lawEnforcementManager.detectionPercentage < 1)
+        {
+            agent.SetDestination(target);
+        }
+        else if (Mathf.Approximately(lawEnforcementManager.detectionPercentage, 1))
         {
             agent.SetDestination(target);
         }

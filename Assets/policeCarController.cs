@@ -25,7 +25,7 @@ public class policeCarController : MonoBehaviour
         lawEnforcementManager = FindObjectOfType<lawEnforcementManager>();
         
         bool randomEntrance = Random.Range(0, 2) == 0;
-        float randomTargetX = Random.Range(-30f, 30f);
+        float randomTargetX = Random.Range(-50f, 50f);
 
         if (randomEntrance) 
         {

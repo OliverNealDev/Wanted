@@ -95,7 +95,7 @@ public class proximityMineController : MonoBehaviour
             
             audio.clip = alertSound;
             audio.Play();
-            lawEnforcementManager.AlertSpottedTransform(transform);
+            lawEnforcementManager.AlertSpottedTransform(new Vector2(transform.position.x, transform.position.y));
             Invoke("Reset", 5f);
         }
     }

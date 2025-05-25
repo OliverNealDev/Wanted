@@ -13,7 +13,7 @@ public class spotlightDetection : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            lawEnforcementManager.ChangeDetectionPercentage(4 * Time.deltaTime);
+            lawEnforcementManager.ChangeDetectionPercentage(1 * Time.deltaTime);
         }
     }
     
@@ -21,7 +21,7 @@ public class spotlightDetection : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            lawEnforcementManager.ChangeDetectionPercentage(4 * Time.deltaTime);
+            lawEnforcementManager.ChangeDetectionPercentage(1 * Time.deltaTime);
         }
     }
 }

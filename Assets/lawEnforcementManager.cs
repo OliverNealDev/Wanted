@@ -15,14 +15,17 @@ public class lawEnforcementManager : MonoBehaviour
     [SerializeField] private GameObject policeOfficerPrefab;
     
     private List<GameObject> policeOfficers = new List<GameObject>();
-    
-    private float detectionPercentage = 0f; 
+
+    public float detectionPercentage { get; private set; } = 0f;
     [SerializeField] private Slider detectionSlider;
     private float timeSinceLastDetectionIncrease = 0f;
     [SerializeField] private float detectionDecreaseRate = 0.1f;
+
+    private GameObject player;
     
     void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player");
         InvokeRepeating("SpawnPoliceCar", 1f, 20.4f);
         InvokeRepeating("SpawnPoliceHelicopter", 1f, 45.4f);
         
@@ -53,6 +56,7 @@ public class lawEnforcementManager : MonoBehaviour
         {
             detectionPercentage = 1f;
             detectionSlider.value = detectionPercentage;
+            AlertSpottedTransform(new Vector2(player.transform.position.x, player.transform.position.y));
         }
         else
         {
@@ -60,7 +64,7 @@ public class lawEnforcementManager : MonoBehaviour
         }
     }
 
-    public void AlertSpottedTransform(Transform targetTransform)
+    public void AlertSpottedTransform(Vector2 targetTransform)
     {
         if (policeOfficers == null || policeOfficers.Count == 0)
         {
@@ -73,7 +77,7 @@ public class lawEnforcementManager : MonoBehaviour
         {
             if (policeOfficer == null) continue;
 
-            float distanceToTarget = Vector3.Distance(policeOfficer.transform.position, targetTransform.position);
+            float distanceToTarget = Vector3.Distance(policeOfficer.transform.position, targetTransform);
             officersWithDistances.Add((policeOfficer, distanceToTarget));
         }
 
@@ -90,7 +94,7 @@ public class lawEnforcementManager : MonoBehaviour
             policeOfficerController controller = officerData.officer.GetComponent<policeOfficerController>();
             if (controller != null)
             {
-                controller.SetTarget(targetTransform.position);
+                controller.SetTarget(targetTransform);
             }
             else
             {
