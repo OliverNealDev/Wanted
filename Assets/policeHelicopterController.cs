@@ -18,9 +18,12 @@ public class policeHelicopterController : MonoBehaviour
     private float timeToNextSpotlightTargetPosChange;
     private float initialSpotlightLocalZ;
     private Vector3 spotlightVelocity = Vector3.zero;
+    
+    private lawEnforcementManager lawEnforcementManager;
 
     void Start()
     {
+        lawEnforcementManager = FindObjectOfType<lawEnforcementManager>();
         centerPoint = new Vector3(0, 0, 0);
         
         Vector2 randomNormalizedDirection2D = Random.insideUnitCircle.normalized;
@@ -50,6 +53,8 @@ public class policeHelicopterController : MonoBehaviour
     void Update()
     {
         transform.position = Vector2.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+        //transform.LookAt(targetPosition);
+        //transform.position = new Vector3(transform.position.x, transform.position.y, 0);
         if (Vector2.Distance(transform.position, targetPosition) < 1f)
         {
             Destroy(gameObject);

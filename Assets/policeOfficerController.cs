@@ -31,11 +31,14 @@ public class policeOfficerController : MonoBehaviour
     private float nextSweepTimer;
     private bool isCurrentlySweeping = false;
     private float currentSweepActiveTime;
+    
+    private lawEnforcementManager lawEnforcementManager;
 
     private SpriteRenderer SR;
 
     void Start()
     {
+        lawEnforcementManager = FindObjectOfType<lawEnforcementManager>();
         agent = GetComponent<NavMeshAgent>();
         agent.updateRotation = false;
         agent.updateUpAxis = false;
@@ -140,19 +143,19 @@ public class policeOfficerController : MonoBehaviour
         target = newTarget;
     }
 
-    /*private void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && !SR.enabled)
+        if (other.CompareTag("Player"))
         {
-            SR.enabled = true;
+            lawEnforcementManager.ChangeDetectionPercentage(1f * Time.deltaTime);
         }
     }
     
-    private void OnTriggerExit2D(Collider2D other)
+    private void OnTriggerStay2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && SR.enabled)
+        if (other.CompareTag("Player"))
         {
-            SR.enabled = false;
+            lawEnforcementManager.ChangeDetectionPercentage(1f * Time.deltaTime);
         }
-    }*/
+    }
 }

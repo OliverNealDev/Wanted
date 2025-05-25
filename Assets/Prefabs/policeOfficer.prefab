@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1057728099971600274}
   - component: {fileID: 3234607181699535633}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: shadow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 6680182014244193331}
   - component: {fileID: 8277854016466242417}
   - component: {fileID: 692365989358649772}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Triangle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -211,7 +211,7 @@ GameObject:
   - component: {fileID: 5901871238278553524}
   - component: {fileID: 7231505003805925835}
   - component: {fileID: 8859899461410036187}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: policeOfficer
   m_TagString: policeOfficer
   m_Icon: {fileID: 0}
@@ -415,11 +415,14 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 4.629939, y: 10.6556015}
-      - {x: -5.343564, y: 10.637345}
+    - - {x: 4.612102, y: 10.459383}
+      - {x: 1.7917595, y: 11.335106}
+      - {x: -0.14418125, y: 11.43478}
+      - {x: -2.0174603, y: 11.2358}
+      - {x: -4.612212, y: 10.476804}
       - {x: -1.5550873, y: 3.0746717}
-      - {x: -0.34294927, y: 0.24690938}
-      - {x: 0.70236254, y: 0.25911707}
+      - {x: -0.42231834, y: 0.070557356}
+      - {x: 0.84585094, y: 0.041243374}
   m_UseDelaunayMesh: 0
 --- !u!212 &8859899461410036187
 SpriteRenderer:
@@ -487,7 +490,7 @@ GameObject:
   - component: {fileID: 3396920630849108390}
   - component: {fileID: 6039850316947787106}
   - component: {fileID: 3685022492189939711}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Flashlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
