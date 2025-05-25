@@ -8,6 +8,7 @@ public class proceduralMap : MonoBehaviour
     private List<GameObject> treeObjects = new List<GameObject>();
     
     private bool treesBaked = false;
+    private Vector2 position;
     
     void Update()
     {
@@ -24,7 +25,15 @@ public class proceduralMap : MonoBehaviour
 
     void GenerateTree()
     {
-        Vector2 position = new Vector2(Random.Range(-60f, 60f), Random.Range(3f, 100f));
+        bool randomBool = Random.Range(0f, 1f) < 0.5f;
+        if (randomBool)
+        {
+            position = new Vector2(Random.Range(-80f, 80f), Random.Range(12f, 80f));
+        }
+        else
+        {
+            position = new Vector2(Random.Range(-80f, 80f), Random.Range(-12f, -80f));
+        }
         for (int i = 0; i < treeObjects.Count; i++)
         {
             if (Vector2.Distance(treeObjects[i].transform.position, position) < 2.5f)

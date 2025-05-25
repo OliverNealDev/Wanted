@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -27,11 +28,14 @@ public class playerController : MonoBehaviour
     private Vector2 _movementInput;
     
     private SpriteRenderer spriteRenderer;
+    
+    private List<GameObject> TreesUnder = new List<GameObject>();
 
     void Start()
     {
         _currentStamina = maxStamina;
         cam = Camera.main;
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -92,6 +96,12 @@ public class playerController : MonoBehaviour
     {
         if (other.CompareTag("Tree"))
         {
+            Debug.Log(other.name);
+            
+            if (!TreesUnder.Contains(other.gameObject))
+            {
+                TreesUnder.Add(other.gameObject);
+            }
             spriteRenderer.color = new Color(1f, 1f, 1f, 0.4f);
         }
     }
@@ -100,7 +110,13 @@ public class playerController : MonoBehaviour
     {
         if (other.CompareTag("Tree"))
         {
-            spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+            Debug.Log("Exited: " + other.name);
+            
+            TreesUnder.Remove(other.gameObject);
+            if (TreesUnder.Count == 0)
+            {
+                spriteRenderer.color = new Color(1f, 1f, 1f, 1f);
+            }
         }
     }
 }

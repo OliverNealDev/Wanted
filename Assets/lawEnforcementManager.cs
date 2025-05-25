@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class lawEnforcementManager : MonoBehaviour
@@ -24,11 +25,42 @@ public class lawEnforcementManager : MonoBehaviour
         
     }
 
-    public void AlertSpottedTransform(Transform transform)
+    public void AlertSpottedTransform(Transform targetTransform)
     {
+        if (policeOfficers == null || policeOfficers.Count == 0)
+        {
+            Debug.LogWarning("No police officers available to alert.");
+            return;
+        }
+
+        var officersWithDistances = new List<(GameObject officer, float distance)>();
         foreach (GameObject policeOfficer in policeOfficers)
         {
-            policeOfficer.GetComponent<policeOfficerController>().SetTarget(transform.position);
+            if (policeOfficer == null) continue;
+
+            float distanceToTarget = Vector3.Distance(policeOfficer.transform.position, targetTransform.position);
+            officersWithDistances.Add((policeOfficer, distanceToTarget));
+        }
+
+        var sortedOfficers = officersWithDistances.OrderBy(o => o.distance).ToList();
+
+        int officersToAlertCount = Mathf.CeilToInt(policeOfficers.Count * 0.25f);
+        officersToAlertCount = Mathf.Min(officersToAlertCount, sortedOfficers.Count);
+
+        var closestOfficers = sortedOfficers.Take(officersToAlertCount);
+
+        Debug.Log($"Alerting {closestOfficers.Count()} closest officers.");
+        foreach (var officerData in closestOfficers)
+        {
+            policeOfficerController controller = officerData.officer.GetComponent<policeOfficerController>();
+            if (controller != null)
+            {
+                controller.SetTarget(targetTransform.position);
+            }
+            else
+            {
+                Debug.LogWarning($"Police officer {officerData.officer.name} does not have a policeOfficerController component.");
+            }
         }
     }
     

@@ -3,7 +3,7 @@ using Random = UnityEngine.Random;
 
 public class policeHelicopterController : MonoBehaviour
 {
-    private Vector3 centerPoint = new Vector2(0f, 30f);
+    private Vector3 centerPoint;
     private float radius = 3f;
     private Vector3 targetPosition;
     public float speed = 10f;
@@ -21,6 +21,8 @@ public class policeHelicopterController : MonoBehaviour
 
     void Start()
     {
+        centerPoint = new Vector3(0, 0, 0);
+        
         Vector2 randomNormalizedDirection2D = Random.insideUnitCircle.normalized;
         Vector3 scaledDirection = new Vector3(randomNormalizedDirection2D.x * radius, randomNormalizedDirection2D.y * radius, 0f);
 
