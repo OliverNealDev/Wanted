@@ -45,6 +45,10 @@ public class policeOfficerController : MonoBehaviour
         {
             Debug.LogError("Player GameObject not found. Make sure it's tagged 'Player'.");
         }
+        
+        float randomSpeedPercentageModifier = Random.Range(0.8f, 1.2f);
+        patrolSpeed *= randomSpeedPercentageModifier;
+        chaseSpeed *= randomSpeedPercentageModifier;
 
         lawEnforcementManager = FindObjectOfType<lawEnforcementManager>();
         if (lawEnforcementManager == null)
@@ -112,7 +116,7 @@ public class policeOfficerController : MonoBehaviour
         {
             agent.speed = patrolSpeed; 
 
-            if (Vector2.Distance(transform.position, target) <= agent.stoppingDistance + 0.1f || !agent.hasPath || agent.pathStatus == NavMeshPathStatus.PathInvalid)
+            if (Vector2.Distance(transform.position, target) <= agent.stoppingDistance + 0.5f || !agent.hasPath || agent.pathStatus == NavMeshPathStatus.PathInvalid)
             {
                 if (searchNodes.instance != null && searchNodes.instance.searchNodesList.Count > 0)
                 {
