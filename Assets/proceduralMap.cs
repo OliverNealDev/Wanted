@@ -15,7 +15,7 @@ public class proceduralMap : MonoBehaviour
     
     void Update()
     {
-        if (treeObjects.Count < 500)
+        if (treeObjects.Count < 250)
         {
             GenerateTree();
         }
@@ -25,7 +25,7 @@ public class proceduralMap : MonoBehaviour
             autoBake.instance.Bake();
         }
         
-        if (bushObjects.Count < 50)
+        if (bushObjects.Count < 30)
         {
             GenerateBush();
         }
@@ -36,11 +36,11 @@ public class proceduralMap : MonoBehaviour
         bool randomBool = Random.Range(0f, 1f) < 0.5f;
         if (randomBool)
         {
-            position = new Vector2(Random.Range(-80f, 80f), Random.Range(12f, 80f));
+            position = new Vector2(Random.Range(-75f, 75f), Random.Range(12f, 60));
         }
         else
         {
-            position = new Vector2(Random.Range(-80f, 80f), Random.Range(-12f, -80f));
+            position = new Vector2(Random.Range(-75f, 75f), Random.Range(-7f, -50));
         }
         
         for (int i = 0; i < bushObjects.Count; i++)
@@ -67,11 +67,11 @@ public class proceduralMap : MonoBehaviour
         bool randomBool = Random.Range(0f, 1f) < 0.5f;
         if (randomBool)
         {
-            position = new Vector2(Random.Range(-80f, 80f), Random.Range(6f, 80f));
+            position = new Vector2(Random.Range(-75f, 75f), Random.Range(12f, 60));
         }
         else
         {
-            position = new Vector2(Random.Range(-80f, 80f), Random.Range(-6f, -80f));
+            position = new Vector2(Random.Range(-75f, 75f), Random.Range(-7f, -50));
         }
         
         for (int i = 0; i < bushObjects.Count; i++)

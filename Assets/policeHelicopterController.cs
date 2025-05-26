@@ -23,8 +23,9 @@ public class policeHelicopterController : MonoBehaviour
 
     void Start()
     {
+        //Time.timeScale = 10f;
         lawEnforcementManager = FindObjectOfType<lawEnforcementManager>();
-        centerPoint = new Vector3(0, 0, 0);
+        centerPoint = new Vector3(10, 3, 0);
         
         Vector2 randomNormalizedDirection2D = Random.insideUnitCircle.normalized;
         Vector3 scaledDirection = new Vector3(randomNormalizedDirection2D.x * radius, randomNormalizedDirection2D.y * radius, 0f);

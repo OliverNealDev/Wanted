@@ -32,21 +32,21 @@ public class policeCarController : MonoBehaviour
         lawEnforcementManager = FindObjectOfType<lawEnforcementManager>();
         
         bool randomEntrance = Random.Range(0, 2) == 0;
-        float randomTargetX = Random.Range(-50f, 50f);
+        float randomTargetX = Random.Range(-56f, 56f);
 
         if (randomEntrance) 
         {
-            transform.position = new Vector3(-75f, 0.75f, 0f);
+            transform.position = new Vector3(-110f, 4, 0f);
             transform.rotation = Quaternion.Euler(0f, 0f, 0f); 
-            initialY = 0.75f;
+            initialY = 4f;
             initialTargetPosition = new Vector2(randomTargetX, initialY);
             pullOverTargetPosition = new Vector2(randomTargetX, initialY + pullOverYOffset);
         }
         else 
         {
-            transform.position = new Vector3(75f, -0.75f, 0f);
+            transform.position = new Vector3(125f, 1, 0f);
             transform.rotation = Quaternion.Euler(0f, 0f, 180f); 
-            initialY = -0.75f;
+            initialY = 1f;
             initialTargetPosition = new Vector2(randomTargetX, initialY);
             pullOverTargetPosition = new Vector2(randomTargetX, initialY - pullOverYOffset);
         }
