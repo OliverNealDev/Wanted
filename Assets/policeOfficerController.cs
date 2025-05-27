@@ -35,6 +35,9 @@ public class policeOfficerController : MonoBehaviour
     [SerializeField] private Vector2 raycastOriginOffset = new Vector2(0, 0.5f);
     [SerializeField] private float lkpSampleRadius = 1.0f; // How far around LKP to search for a valid NavMesh point
 
+    [Header("Capture Settings")] // New Header for touch settings
+    [SerializeField] private float playerTouchDistance = 0.75f; // Distance to consider a "touch"
+
     private Light2D officerFlashlight;
     NavMeshAgent agent;
 
@@ -56,9 +59,19 @@ public class policeOfficerController : MonoBehaviour
     private Vector2 lastKnownPlayerPosition;
     private bool canSeePlayerCurrentFrame;
     private bool hasReachedLKPInCurrentSearch = false;
+    
+    // Flag to ensure time freeze logic runs only once
+    private static bool isTimeFrozen = false;
+
 
     void Start()
     {
+        // Reset time scale at the start of the game or scene,
+        // in case it was frozen from a previous session (especially in editor)
+        // A dedicated GameManager is a better place for this generally.
+        Time.timeScale = 1f;
+        isTimeFrozen = false;
+
         player = GameObject.FindGameObjectWithTag("Player");
         if (player == null)
         {
@@ -145,6 +158,25 @@ public class policeOfficerController : MonoBehaviour
 
     void Update()
     {
+        // If time is frozen, the officer should essentially do nothing active.
+        if (isTimeFrozen) // Check static flag
+        {
+            if (agent != null && agent.isOnNavMesh && agent.isActiveAndEnabled && !agent.isStopped)
+            {
+                agent.isStopped = true; // Explicitly stop the agent
+                agent.velocity = Vector3.zero; // Clear velocity
+            }
+            // Potentially disable flashlight or other visual cues if needed
+            // if (officerFlashlight != null) officerFlashlight.enabled = false;
+            return; // Skip all other update logic
+        }
+         // Ensure agent can move if time is not frozen (and it was previously stopped by time freeze)
+        else if (agent != null && agent.isOnNavMesh && agent.isActiveAndEnabled && agent.isStopped)
+        {
+             agent.isStopped = false;
+        }
+
+
         if (player == null || agent == null || !agent.isOnNavMesh)
         {
             if (officerFlashlight != null && (player == null || agent == null || !agent.isOnNavMesh))
@@ -154,6 +186,10 @@ public class policeOfficerController : MonoBehaviour
             canSeePlayerCurrentFrame = false;
             return;
         }
+        
+        // Check for direct touch before other logic, as this is a game-ending condition
+        CheckForPlayerTouch();
+        if (isTimeFrozen) return; // If touch happened and froze time, exit early.
 
         HandleStateTransitions();
         ExecuteCurrentStateBehavior();
@@ -161,6 +197,33 @@ public class policeOfficerController : MonoBehaviour
         RotateTowardsTargetWithSweep();
         UpdateFlashlightStatus();
     }
+
+    void CheckForPlayerTouch()
+    {
+        if (isTimeFrozen || player == null) return; // Don't check if time already frozen or no player
+
+        float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
+        if (distanceToPlayer < playerTouchDistance)
+        {
+            Debug.Log("PLAYER TOUCHED by " + gameObject.name + "! Time Freezing.");
+            Time.timeScale = 0f;
+            isTimeFrozen = true; // Set the static flag
+
+            // Optional: Notify a game manager or trigger a game over sequence
+            if (lawEnforcementManager != null)
+            {
+                // You might want a specific method in lawEnforcementManager for this
+                // e.g., lawEnforcementManager.HandlePlayerCaught();
+            }
+            // Stop this officer's NavMeshAgent immediately
+            if (agent != null && agent.isOnNavMesh)
+            {
+                agent.isStopped = true;
+                agent.velocity = Vector3.zero;
+            }
+        }
+    }
+
 
     void HandleStateTransitions()
     {
@@ -226,25 +289,23 @@ public class policeOfficerController : MonoBehaviour
             case OfficerState.Searching:
                 agent.speed = patrolSpeed;
 
-                if (!hasReachedLKPInCurrentSearch) // Phase 1: Go to Last Known Position (LKP)
+                if (!hasReachedLKPInCurrentSearch) 
                 {
-                    // Check if we are already at (or very close to) the LKP
                     if (Vector2.Distance(transform.position, lastKnownPlayerPosition) <= agent.stoppingDistance + 0.2f)
                     {
-                        hasReachedLKPInCurrentSearch = true; // Mark LKP as effectively reached
-                                                             // Proceed to Phase 2: Pick a search node
+                        hasReachedLKPInCurrentSearch = true; 
                         if (searchNodes.instance != null && searchNodes.instance.searchNodesList.Count > 0)
                         {
                             Vector2 nextSearchTargetNode = searchNodes.instance.searchNodesList[Random.Range(0, searchNodes.instance.searchNodesList.Count)].position;
                             if (agent.isOnNavMesh) agent.SetDestination(nextSearchTargetNode);
-                            target = nextSearchTargetNode; // Update target for Phase 2 logic & rotation
+                            target = nextSearchTargetNode; 
                         }
                         else
                         {
-                            currentState = OfficerState.Patrolling; // No search nodes, fallback to patrol
+                            currentState = OfficerState.Patrolling; 
                         }
                     }
-                    else // Not yet at LKP, try to path towards it
+                    else 
                     {
                         if (agent.isOnNavMesh)
                         {
@@ -252,29 +313,28 @@ public class policeOfficerController : MonoBehaviour
                             if (NavMesh.SamplePosition(lastKnownPlayerPosition, out hit, lkpSampleRadius, NavMesh.AllAreas))
                             {
                                 agent.SetDestination(hit.position);
-                                target = hit.position; // Target the valid NavMesh position
+                                target = hit.position; 
                             }
                             else
                             {
                                 Debug.LogWarning($"Officer {gameObject.name} could not find valid NavMesh position near LKP {lastKnownPlayerPosition}. Switching to Patrolling.");
-                                currentState = OfficerState.Patrolling; // Fallback if LKP is too far from NavMesh
+                                currentState = OfficerState.Patrolling; 
                             }
                         }
-                        else { currentState = OfficerState.Patrolling; } // Fallback if not on NavMesh
+                        else { currentState = OfficerState.Patrolling; } 
                     }
                 }
-                else // hasReachedLKPInCurrentSearch is true: Phase 2 - Go to the chosen search node
+                else 
                 {
-                    // 'target' should be the search node picked at the end of Phase 1.
                     if (Vector2.Distance(transform.position, target) <= agent.stoppingDistance + 0.5f || (!agent.hasPath && !agent.pathPending) || agent.pathStatus == NavMeshPathStatus.PathInvalid)
                     {
-                        currentState = OfficerState.Patrolling; // Reached search node or path failed, switch to patrol
+                        currentState = OfficerState.Patrolling; 
                     }
-                    else if (agent.destination != (Vector3)target && agent.isOnNavMesh) // Ensure destination is correctly set
+                    else if (agent.destination != (Vector3)target && agent.isOnNavMesh) 
                     {
                          agent.SetDestination(target);
                     }
-                    else if(!agent.isOnNavMesh) { currentState = OfficerState.Patrolling; } // Fallback
+                    else if(!agent.isOnNavMesh) { currentState = OfficerState.Patrolling; } 
                 }
                 break;
         }
@@ -343,33 +403,28 @@ public class policeOfficerController : MonoBehaviour
 
         float finalAngle = baseAngle;
 
-        // Only apply sweep if currently sweeping AND NOT in Chasing state
         if (isCurrentlySweeping && currentState != OfficerState.Chasing)
         {
             float sweepOscillation = Mathf.Sin(Time.time * sweepOscillationSpeed);
             float sweepAngleOffset = sweepOscillation * maxSweepAngle;
             
-            // Apply sweep differently based on state (excluding Chasing here)
             if (agent.hasPath && agent.velocity.sqrMagnitude > 0.05f) 
             {
-                // Sweeping while actively moving/patrolling or searching
                 finalAngle += sweepAngleOffset * 0.6f;
             }
             else 
             {
-                // Wider sweep when stationary (patrolling at a point or searching without movement)
                 finalAngle += sweepAngleOffset;
             }
         }
-        // If currentState is Chasing, or if not isCurrentlySweeping, 
-        // finalAngle remains baseAngle, which is directed towards the target (player in chase).
-
         Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, finalAngle));
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 
     private void placeProximityMine()
     {
+        if (isTimeFrozen) return; // Don't place mines if time is frozen
+
         if (proximityMinePrefab != null && proximityMineCount > 0)
         {
             Vector2 minePosition = (Vector2)transform.position + Random.insideUnitCircle * 0.5f;
@@ -386,6 +441,8 @@ public class policeOfficerController : MonoBehaviour
 
     public void SetTarget(Vector2 newTarget)
     {
+        if (isTimeFrozen) return;
+
         if (currentState == OfficerState.Patrolling)
         {
             this.target = newTarget;
@@ -408,6 +465,11 @@ public class policeOfficerController : MonoBehaviour
     {
         if (officerFlashlight != null)
         {
+            if (isTimeFrozen) // Turn off flashlight if time is frozen
+            {
+                 officerFlashlight.enabled = false;
+                 return;
+            }
             if (player != null)
             {
                 float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
@@ -421,44 +483,43 @@ public class policeOfficerController : MonoBehaviour
         }
     }
     
+    // This OnTriggerStay2D is now purely for vision detection.
+    // The direct touch/capture is handled in CheckForPlayerTouch().
     private void OnTriggerStay2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && player != null && lawEnforcementManager != null)
+        if (isTimeFrozen || player == null || lawEnforcementManager == null || !other.CompareTag("Player"))
         {
-            Vector2 currentOfficerPos = (Vector2)transform.position;
-            Vector2 rayOrigin = currentOfficerPos + raycastOriginOffset;
-            Vector2 playerCenterPos = (Vector2)player.transform.position + raycastOriginOffset; 
-            Vector2 directionToPlayer = (playerCenterPos - rayOrigin).normalized;
-            float distanceToPlayer = Vector2.Distance(rayOrigin, playerCenterPos);
+            // If time is frozen, no player, no manager, or not the player, do nothing for vision.
+            // Also, if it's the player but vision is already blocked, canSeePlayerCurrentFrame should be false.
+            // Setting canSeePlayerCurrentFrame to false if ray is blocked is handled below.
+            return;
+        }
 
-            if (distanceToPlayer <= 0.01f) 
+        Vector2 currentOfficerPos = (Vector2)transform.position;
+        Vector2 rayOrigin = currentOfficerPos + raycastOriginOffset;
+        Vector2 playerCenterPos = (Vector2)other.bounds.center; // Using bounds.center for more accuracy
+        Vector2 directionToPlayer = (playerCenterPos - rayOrigin).normalized;
+        float distanceToPlayerForRay = Vector2.Distance(rayOrigin, playerCenterPos);
+
+        // Don't bother raycasting if distance is virtually zero (already touching, covered by CheckForPlayerTouch)
+        // or if the trigger itself isn't very large. This check is mainly for line of sight.
+        if (distanceToPlayerForRay <= 0.05f) // Very close, likely means direct line of sight
+        {
+            // If extremely close, still do the detection logic.
+            // The 'distanceToPlayer <= 0.01f' was removed as touch is separate.
+            // This part handles if they are inside the trigger and very close, unobstructed.
+        }
+
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, directionToPlayer, distanceToPlayerForRay, visionObstructingLayers);
+
+        if (hit.collider == null) // No obstruction
+        {
+            Debug.DrawRay(rayOrigin, directionToPlayer * distanceToPlayerForRay, Color.green); 
+
+            playerController pc = other.GetComponent<playerController>();
+            if (pc != null) // Ensure playerController exists
             {
-                 if (lawEnforcementManager.detectionPercentage < 1f)
-                 {
-                     if (other.GetComponent<playerController>().foliageUnder.Count == 0)
-                     {
-                         lawEnforcementManager.ChangeDetectionPercentage(1 * Time.deltaTime);
-                     }
-                     else
-                     {
-                         lawEnforcementManager.ChangeDetectionPercentage(0.25f * Time.deltaTime);
-                     }
-                 }
-                 if (lawEnforcementManager.detectionPercentage >= 1f)
-                 {
-                    canSeePlayerCurrentFrame = true;
-                 }
-                Debug.DrawRay(rayOrigin, directionToPlayer * distanceToPlayer, Color.blue); 
-                return;
-            }
-
-            RaycastHit2D hit = Physics2D.Raycast(rayOrigin, directionToPlayer, distanceToPlayer, visionObstructingLayers);
-
-            if (hit.collider == null)
-            {
-                Debug.DrawRay(rayOrigin, directionToPlayer * distanceToPlayer, Color.green); 
-
-                if (other.GetComponent<playerController>().foliageUnder.Count == 0)
+                if (pc.foliageUnder.Count == 0)
                 {
                     lawEnforcementManager.ChangeDetectionPercentage(1 * Time.deltaTime);
                 }
@@ -466,20 +527,24 @@ public class policeOfficerController : MonoBehaviour
                 {
                     lawEnforcementManager.ChangeDetectionPercentage(0.25f * Time.deltaTime);
                 }
-                if (lawEnforcementManager.detectionPercentage >= 1f)
-                {
-                    canSeePlayerCurrentFrame = true;
-                }
             }
-            else
+            // Only set canSeePlayerCurrentFrame if detection is full.
+            // This prevents officer from "seeing" if detection isn't 100% yet.
+            if (lawEnforcementManager.detectionPercentage >= 1f)
             {
-                Debug.DrawRay(rayOrigin, directionToPlayer * hit.distance, Color.red); 
-                canSeePlayerCurrentFrame = false; 
+                canSeePlayerCurrentFrame = true;
             }
+            // If detection is not full, they are "aware" but not "seeing" for chase purposes yet.
+            // canSeePlayerCurrentFrame should remain false or be set by other means (e.g. sound)
+            // For this logic, if detection < 1, they don't "see" to initiate chase from vision alone.
+            // However, if they are already chasing, they will continue.
+            // Consider if detection < 1f should set canSeePlayerCurrentFrame = false here if not chasing.
+            // For now, only set to true on full detection.
         }
-        else if (other.CompareTag("Player"))
+        else // Obstruction found
         {
-            canSeePlayerCurrentFrame = false;
+            Debug.DrawRay(rayOrigin, directionToPlayer * hit.distance, Color.red); 
+            canSeePlayerCurrentFrame = false; 
         }
     }
 
@@ -488,6 +553,36 @@ public class policeOfficerController : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             canSeePlayerCurrentFrame = false; 
+            // Optionally, you might want to slowly decrease detection if the player exits the trigger
+            // if (lawEnforcementManager != null) lawEnforcementManager.ChangeDetectionPercentage(-0.5f * Time.deltaTime); // Example
+        }
+    }
+
+    // Call this from a Game Manager or UI button to reset the game
+    public static void ResetTime()
+    {
+        Time.timeScale = 1f;
+        isTimeFrozen = false;
+    }
+
+    void OnDestroy()
+    {
+        // Optional: If this officer is destroyed for some reason, ensure invoked methods are cancelled.
+        CancelInvoke("placeProximityMine");
+    }
+
+     void OnEnable()
+    {
+        // If the object is pooled and re-enabled, ensure time isn't frozen by this instance
+        // (though the static 'isTimeFrozen' handles global state)
+        // and that the NavMeshAgent is correctly configured if it was stopped.
+        if (agent != null && agent.isOnNavMesh)
+        {
+            if (isTimeFrozen) {
+                agent.isStopped = true;
+            } else {
+                agent.isStopped = false;
+            }
         }
     }
 }

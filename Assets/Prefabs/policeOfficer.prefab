@@ -330,6 +330,7 @@ MonoBehaviour:
     m_Bits: 34816
   raycastOriginOffset: {x: 0, y: 0}
   lkpSampleRadius: 0.1
+  playerTouchDistance: 0.8
 --- !u!195 &8087418043640440310
 NavMeshAgent:
   m_ObjectHideFlags: 0
