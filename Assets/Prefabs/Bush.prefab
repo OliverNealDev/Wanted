@@ -16,7 +16,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1363476084228793597
 Transform:
   m_ObjectHideFlags: 0
@@ -99,6 +99,9 @@ GameObject:
   - component: {fileID: 73135370516211644}
   - component: {fileID: 479309743657075099}
   - component: {fileID: 4552553934358815920}
+  - component: {fileID: 5675671148789999768}
+  - component: {fileID: 5482707632636391411}
+  - component: {fileID: 2492065573406091382}
   m_Layer: 15
   m_Name: Bush
   m_TagString: berryBush
@@ -194,6 +197,7 @@ MonoBehaviour:
   berryImmediateSpawnChance: 0.2
   minBerrySpawnTime: 6
   maxBerrySpawnTime: 18
+  fadeDuration: 0.25
 --- !u!58 &4552553934358815920
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -230,3 +234,88 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
+--- !u!114 &5675671148789999768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7133700486921496320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7db70e0ea77f5ac47a8f4565a9406397, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShadowGroup: 0
+  m_Priority: 2
+  m_ComponentVersion: 5
+  m_HasRenderer: 1
+  m_UseRendererSilhouette: 1
+  m_CastsShadows: 1
+  m_SelfShadows: 0
+  m_AlphaCutoff: 0.1
+  m_ApplyToSortingLayers: 000000005b6aba77
+  m_ShapePath:
+  - {x: -0.4432463, y: -0.93002546, z: 0}
+  - {x: -0.9340077, y: -0.12473719, z: 0}
+  - {x: -0.93915254, y: 0.53755975, z: 0}
+  - {x: -0.39550817, y: 0.927923, z: 0}
+  - {x: 0.48069453, y: 0.94009244, z: 0}
+  - {x: 0.7961612, y: 0.81137305, z: 0}
+  - {x: 0.9340077, y: 0.06693215, z: 0}
+  - {x: 0.73531383, y: -0.7018478, z: 0}
+  - {x: 0.36508444, y: -0.94313484, z: 0}
+  m_ShapePathHash: 270330078
+  m_InstanceId: 0
+  m_ShadowShape2DComponent: {fileID: 0}
+  m_ShadowShape2DProvider:
+    rid: -2
+  m_ShadowCastingSource: 1
+  m_ShadowMesh:
+    m_Mesh: {fileID: 0}
+    m_LocalBounds:
+      m_Center: {x: -0.0025724173, y: -0.0015211701, z: 0}
+      m_Extent: {x: 0.9365801, y: 0.9416137, z: 0}
+    m_EdgeProcessing: 1
+    m_TrimEdge: 0.1
+    m_FlipX: 0
+    m_FlipY: 0
+    m_InitialTrim: 0
+  m_CastingOption: 2
+  m_PreviousTrimEdge: 0.1
+  m_PreviousEdgeProcessing: 1
+  m_PreviousShadowCastingSource: 1
+  m_PreviousShadowShape2DSource: {fileID: 4552553934358815920}
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+--- !u!114 &5482707632636391411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7133700486921496320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38f48a8d66b2adc46887f23a3a88ac01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShadowGroup: 0
+  m_Priority: 0
+--- !u!114 &2492065573406091382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7133700486921496320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be8ed866c83cdf84796e58cd914f2978, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cullDistance: 17
+  playerTransform: {fileID: 0}

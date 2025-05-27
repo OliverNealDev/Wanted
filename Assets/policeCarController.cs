@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class policeCarController : MonoBehaviour
 {
@@ -8,44 +9,47 @@ public class policeCarController : MonoBehaviour
     private Vector2 initialTargetPosition;
     private Vector2 pullOverTargetPosition;
     private float initialY;
-    private float pullOverYOffset = 6f; 
-    
+    private float pullOverYOffset = 6f;
+
     [SerializeField] private GameObject policeOfficerPrefab;
-    
+
     [SerializeField] private float maxSpeed = 10f;
     [SerializeField] private float smoothTime = 0.3f;
 
     private bool disbandedOfficers = false;
     private Vector2 currentVelocity = Vector2.zero;
-    
+
     [SerializeField] private lawEnforcementManager lawEnforcementManager;
-    
+
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip siren1Clip;
     [SerializeField] private AudioClip siren2Clip;
     [SerializeField] private AudioClip parkingClip;
 
+    private float timeAlive = 0f;
+    private const float selfDestructTimeout = 20f;
+
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
         lawEnforcementManager = FindObjectOfType<lawEnforcementManager>();
-        
+
         bool randomEntrance = Random.Range(0, 2) == 0;
         float randomTargetX = Random.Range(-56f, 56f);
 
-        if (randomEntrance) 
+        if (randomEntrance)
         {
             transform.position = new Vector3(-110f, 4, 0f);
-            transform.rotation = Quaternion.Euler(0f, 0f, 0f); 
+            transform.rotation = Quaternion.Euler(0f, 0f, 0f);
             initialY = 4f;
             initialTargetPosition = new Vector2(randomTargetX, initialY);
             pullOverTargetPosition = new Vector2(randomTargetX, initialY + pullOverYOffset);
         }
-        else 
+        else
         {
             transform.position = new Vector3(125f, 1, 0f);
-            transform.rotation = Quaternion.Euler(0f, 0f, 180f); 
+            transform.rotation = Quaternion.Euler(0f, 0f, 180f);
             initialY = 1f;
             initialTargetPosition = new Vector2(randomTargetX, initialY);
             pullOverTargetPosition = new Vector2(randomTargetX, initialY - pullOverYOffset);
@@ -59,13 +63,23 @@ public class policeCarController : MonoBehaviour
         {
             audioSource.clip = siren2Clip;
         }
-        
+
         audioSource.loop = true;
         audioSource.Play();
     }
 
     void Update()
     {
+        if (currentState != CarState.Parked)
+        {
+            timeAlive += Time.deltaTime;
+            if (timeAlive > selfDestructTimeout)
+            {
+                Destroy(gameObject);
+                return;
+            }
+        }
+
         switch (currentState)
         {
             case CarState.Approaching:
@@ -105,8 +119,8 @@ public class policeCarController : MonoBehaviour
             (Vector2)transform.position,
             pullOverTargetPosition,
             ref currentVelocity,
-            smoothTime, 
-            maxSpeed / 2f, 
+            smoothTime,
+            maxSpeed / 2f,
             Time.deltaTime
         );
 
@@ -119,9 +133,9 @@ public class policeCarController : MonoBehaviour
 
         if (Vector2.Distance((Vector2)transform.position, pullOverTargetPosition) < 0.1f)
         {
-            currentVelocity = Vector2.zero; 
-            transform.position = pullOverTargetPosition; 
-            transform.rotation = Quaternion.Euler(0f, 0f, initialY > 0 ? 90f : -90f);
+            currentVelocity = Vector2.zero;
+            transform.position = pullOverTargetPosition;
+            //transform.rotation = Quaternion.Euler(0f, 0f, initialY > 0 ? 90f : -90f);
 
             currentState = CarState.Parked;
             if (autoBake.instance != null)
@@ -142,10 +156,23 @@ public class policeCarController : MonoBehaviour
             audioSource.clip = parkingClip;
             audioSource.loop = false;
             audioSource.Play();
-            
+
+            if (transform.childCount > 2)
+            {
+                Transform thirdChild = transform.GetChild(2);
+                if (thirdChild != null)
+                {
+                    Light2D lightComponent = thirdChild.GetComponent<Light2D>();
+                    if (lightComponent != null)
+                    {
+                        lightComponent.enabled = false;
+                    }
+                }
+            }
+
             disbandedOfficers = true;
-            
-            float sideSpawnOffset = 1.5f; 
+
+            float sideSpawnOffset = 1.5f;
             float longitudinalSpawnOffset = 0.5f;
 
             lawEnforcementManager.SpawnPoliceOfficer(transform.position + new Vector3(sideSpawnOffset, longitudinalSpawnOffset, 0));
@@ -154,32 +181,19 @@ public class policeCarController : MonoBehaviour
             lawEnforcementManager.SpawnPoliceOfficer(transform.position + new Vector3(-sideSpawnOffset, -longitudinalSpawnOffset, 0));
         }
     }
-    
+
     void UpdateRotationBasedOnXVelocity()
     {
-        if (Mathf.Abs(currentVelocity.x) > 0.01f) 
+        if (Mathf.Abs(currentVelocity.x) > 0.01f)
         {
-            if (currentVelocity.x > 0.01f) 
+            if (currentVelocity.x > 0.01f)
             {
                 transform.rotation = Quaternion.Euler(0f, 0f, 0f);
             }
-            else if (currentVelocity.x < -0.01f) 
+            else if (currentVelocity.x < -0.01f)
             {
                 transform.rotation = Quaternion.Euler(0f, 0f, 180f);
             }
         }
     }
-
-    /*void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (currentState != CarState.Parked)
-        {
-            currentState = CarState.Parked; 
-            currentVelocity = Vector2.zero; 
-            if (autoBake.instance != null)
-            {
-                autoBake.instance.Bake();
-            }
-        }
-    }*/
 }

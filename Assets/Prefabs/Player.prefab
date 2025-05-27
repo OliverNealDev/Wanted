@@ -197,8 +197,9 @@ MonoBehaviour:
   walkSpeed: 3
   sprintSpeedMultiplier: 1.5
   maxStamina: 100
-  staminaRegenRate: 5
   staminaDrainRate: 10
+  _currentStamina: 0.5
+  staminaSlider: {fileID: 0}
   turnSpeed: 15
   seenToSpottedTime: 0.4
   sneakingAudioDistance: 5

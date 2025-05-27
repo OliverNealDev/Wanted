@@ -20,14 +20,15 @@ public class lawEnforcementManager : MonoBehaviour
     [SerializeField] private Slider detectionSlider;
     private float timeSinceLastDetectionIncrease = 0f;
     [SerializeField] private float detectionDecreaseRate = 0.1f;
+    private int policeCarsSpawned = 0;
 
     private GameObject player;
     
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        InvokeRepeating("SpawnPoliceCar", 1f, 10.44f);
-        InvokeRepeating("SpawnPoliceHelicopter", 1f, 20.4f);
+        InvokeRepeating("SpawnPoliceCar", 1f, 30.44f);
+        InvokeRepeating("SpawnPoliceHelicopter", 60f, 20.4f);
         
         detectionSlider.value = detectionPercentage;
     }
@@ -56,7 +57,7 @@ public class lawEnforcementManager : MonoBehaviour
         {
             detectionPercentage = 1f;
             detectionSlider.value = detectionPercentage;
-            AlertSpottedTransform(new Vector2(player.transform.position.x, player.transform.position.y));
+            //AlertSpottedTransform(new Vector2(player.transform.position.x, player.transform.position.y));
         }
         else
         {
@@ -105,7 +106,12 @@ public class lawEnforcementManager : MonoBehaviour
     
     void SpawnPoliceCar()
     {
+        policeCarsSpawned++;
         Instantiate(policeCarPrefab, policeCarSpawnPoint, Quaternion.identity);
+        if (policeCarsSpawned > 3)
+        {
+            CancelInvoke(nameof(SpawnPoliceCar));
+        }
     }
     
     public void SpawnPoliceOfficer(Vector3 position)

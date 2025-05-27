@@ -8,6 +8,7 @@ TagManager:
   - policeOfficer
   - Tree
   - berryBush
+  - WorldCanvas
   layers:
   - Default
   - TransparentFX
@@ -26,13 +27,13 @@ TagManager:
   - 
   - berryBush
   - 
+  - playerAudioProximity
   - 
+  - visionObstructingLayers
   - 
+  - cherry
   - 
-  - 
-  - 
-  - 
-  - 
+  - player
   - 
   - 
   - 
@@ -42,6 +43,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Above
+    uniqueID: 1858744431
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0

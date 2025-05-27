@@ -25,7 +25,7 @@ public class proceduralMap : MonoBehaviour
             autoBake.instance.Bake();
         }
         
-        if (bushObjects.Count < 30)
+        if (bushObjects.Count < 60)
         {
             GenerateBush();
         }
@@ -36,11 +36,11 @@ public class proceduralMap : MonoBehaviour
         bool randomBool = Random.Range(0f, 1f) < 0.5f;
         if (randomBool)
         {
-            position = new Vector2(Random.Range(-75f, 75f), Random.Range(12f, 60));
+            position = new Vector2(Random.Range(-56f, 56f), Random.Range(14f, 45));
         }
         else
         {
-            position = new Vector2(Random.Range(-75f, 75f), Random.Range(-7f, -50));
+            position = new Vector2(Random.Range(-56f, 56f), Random.Range(-9f, -40));
         }
         
         for (int i = 0; i < bushObjects.Count; i++)
@@ -67,11 +67,11 @@ public class proceduralMap : MonoBehaviour
         bool randomBool = Random.Range(0f, 1f) < 0.5f;
         if (randomBool)
         {
-            position = new Vector2(Random.Range(-75f, 75f), Random.Range(12f, 60));
+            position = new Vector2(Random.Range(-56f, 56f), Random.Range(7f, 45));
         }
         else
         {
-            position = new Vector2(Random.Range(-75f, 75f), Random.Range(-7f, -50));
+            position = new Vector2(Random.Range(-56f, 56f), Random.Range(-4f, -40));
         }
         
         for (int i = 0; i < bushObjects.Count; i++)

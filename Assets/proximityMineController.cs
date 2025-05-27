@@ -41,6 +41,16 @@ public class proximityMineController : MonoBehaviour
         mineLight = GetComponent<Light2D>();
         audioSource = GetComponent<AudioSource>();
 
+        CircleCollider2D[] collidersOnObject = GetComponents<CircleCollider2D>();
+        foreach (CircleCollider2D currentCollider in collidersOnObject)
+        {
+            if (currentCollider.isTrigger)
+            {
+                currentCollider.radius = proximityRadius * 2f;
+                break; 
+            }
+        }
+
         baseLightIntensity = mineLight.intensity;
         baseLightOuterRadius = mineLight.pointLightOuterRadius;
         
@@ -111,8 +121,8 @@ public class proximityMineController : MonoBehaviour
             if(!SR.enabled) SR.enabled = true;
 
             mineLight.enabled = true;
-            mineLight.intensity = baseLightIntensity * 3f;
-            mineLight.pointLightOuterRadius = baseLightOuterRadius * 3f;
+            mineLight.intensity = baseLightIntensity * 1.5f; 
+            mineLight.pointLightOuterRadius = baseLightOuterRadius * 1.75f; 
             
             audioSource.Stop(); 
             audioSource.clip = alertSound;
@@ -197,8 +207,8 @@ public class proximityMineController : MonoBehaviour
             if (isAlerting)
             {
                 mineLight.enabled = true;
-                mineLight.intensity = baseLightIntensity * 3f;
-                mineLight.pointLightOuterRadius = baseLightOuterRadius * 3f;
+                mineLight.intensity = baseLightIntensity * 1.5f; 
+                mineLight.pointLightOuterRadius = baseLightOuterRadius * 1.75f; 
             }
             else if (isLit) 
             {

@@ -25,7 +25,7 @@ public class treeController : MonoBehaviour
         treeStump = transform.GetChild(0).gameObject;
         treeStumpRenderer = treeStump.GetComponent<SpriteRenderer>();
 
-        float randomScale = UnityEngine.Random.Range(0.9f, 1.1f);
+        float randomScale = UnityEngine.Random.Range(0.8f, 1.2f);
         transform.localScale = new Vector3(randomScale, randomScale, 1);
 
         Color initialTopColor = treeTopRenderer.material.color;

@@ -9,6 +9,10 @@ public class musicManager : MonoBehaviour
     [SerializeField] private float fadeDuration = 1.0f; // Duration of the music fade in seconds
     [SerializeField] private float minChaseDuration = 10.0f; // Minimum duration chase music should play
 
+    // Define target volumes
+    private const float PASSIVE_MUSIC_VOLUME = 0.05f;
+    private const float CHASE_MUSIC_VOLUME = 0.03f;
+
     private GameObject player;
     private lawEnforcementManager lawEnforcementManager;
     private Coroutine currentFadeCoroutine;
@@ -42,7 +46,7 @@ public class musicManager : MonoBehaviour
         if (passiveMusic != null)
         {
             audioSource.clip = passiveMusic;
-            audioSource.volume = 1f; // Start at full volume
+            audioSource.volume = PASSIVE_MUSIC_VOLUME; // Use defined passive music volume
             audioSource.Play();
             currentTargetClip = passiveMusic;
         }
@@ -50,10 +54,8 @@ public class musicManager : MonoBehaviour
         {
             Debug.LogError("Passive Music AudioClip is not assigned in the Inspector. Music manager may not function correctly.");
         }
-        // Initialize chaseMusicStartTime to a value that won't prematurely block switching back from chase if it somehow started as chase.
-        // Effectively, Time.time will be greater than 0, so Time.time - 0 >= minChaseDuration will be true if minChaseDuration is not excessively large.
-        // This is mainly relevant if the game starts directly in a chase state without a proper transition.
-        chaseMusicStartTime = -minChaseDuration; // Ensures that if somehow currentTargetClip is chaseMusic initially, it can switch if conditions met.
+        // Initialize chaseMusicStartTime
+        chaseMusicStartTime = -minChaseDuration;
     }
 
     void FixedUpdate()
@@ -78,8 +80,6 @@ public class musicManager : MonoBehaviour
                     Debug.LogWarning("Chase Music AudioClip is not assigned. Cannot switch.");
                 }
             }
-            // If already targeting/playing chase music and detection is still high, do nothing.
-            // The minChaseDuration timer is running from its initial start.
         }
         else // Detection is low
         {
@@ -99,9 +99,8 @@ public class musicManager : MonoBehaviour
                         Debug.LogWarning("Passive Music AudioClip is not assigned. Cannot switch back.");
                     }
                 }
-                // Else, min duration NOT passed, so continue chase music even though detection is low.
             }
-            else if (currentTargetClip != passiveMusic) // If not targeting chase, and not targeting passive (e.g. initial state or error)
+            else if (currentTargetClip != passiveMusic) // If not targeting chase, and not targeting passive
             {
                 // Fallback to passive if detection is low and we're not already on it or committed to chase.
                 if (passiveMusic != null)
@@ -110,8 +109,6 @@ public class musicManager : MonoBehaviour
                 }
                 else
                 {
-                    // Cannot switch to passive if not assigned.
-                    // Consider stopping music or logging error if currentTargetClip is also null.
                     if(currentTargetClip == null) {
                          Debug.LogWarning("Passive Music AudioClip is not assigned, and no current music target. Music will be silent or unchanged.");
                     }
@@ -128,13 +125,20 @@ public class musicManager : MonoBehaviour
             return;
         }
 
-        // If we're already targeting this clip and it's playing (or about to play via fade), do nothing
         if (currentTargetClip == newClip)
         {
-            // If it's the target, and the audio source is already playing this clip and at full volume (or fading in to it),
-            // we might not need to restart the fade.
-            // However, simply checking currentTargetClip == newClip handles preventing re-triggering the same fade.
-            return;
+            // If we are already targeting this clip, and it's playing at the correct volume, do nothing.
+            // Check if the current volume matches the target volume for this clip.
+            float expectedVolume = 0f;
+            if (newClip == passiveMusic) expectedVolume = PASSIVE_MUSIC_VOLUME;
+            else if (newClip == chaseMusic) expectedVolume = CHASE_MUSIC_VOLUME;
+            else expectedVolume = 1.0f; // Default for other clips
+
+            // If already playing this clip and volume is close enough to target, don't restart fade.
+            if (audioSource.clip == newClip && audioSource.isPlaying && Mathf.Approximately(audioSource.volume, expectedVolume))
+            {
+                return;
+            }
         }
         
         if (currentFadeCoroutine != null)
@@ -147,47 +151,43 @@ public class musicManager : MonoBehaviour
 
     private IEnumerator FadeMusic(AudioClip newClip)
     {
-        float initialVolumeForFadeOut = audioSource.volume; // Volume to fade from
+        float initialVolumeForFadeOut = audioSource.volume; 
         float timer = 0f;
 
-        // Fade out current music (if any is playing and volume is > 0)
-        if (audioSource.isPlaying && audioSource.volume > 0.01f) // Use a small threshold for volume
+        // Fade out current music
+        if (audioSource.isPlaying && audioSource.volume > 0.001f) // Use a very small threshold
         {
-            // Only fade out if the clip is actually changing
-            if (audioSource.clip != newClip) {
+            if (audioSource.clip != newClip || !Mathf.Approximately(audioSource.volume, GetTargetVolumeForClip(newClip)))
+            {
                 while (timer < fadeDuration)
                 {
                     audioSource.volume = Mathf.Lerp(initialVolumeForFadeOut, 0f, timer / fadeDuration);
                     timer += Time.deltaTime;
                     yield return null;
                 }
-                audioSource.volume = 0f;
-                audioSource.Stop(); // Stop after fade out
-            } else {
-                 // If it's the same clip, but we are here, it might be to ensure it's playing and at target volume
-                 // This case should ideally be handled by the StartFade checks, but as a safeguard:
-                 initialVolumeForFadeOut = audioSource.volume; // re-evaluate current volume for fade-in
+            }
+            audioSource.volume = 0f;
+            // Don't stop if it's the same clip we're fading to (e.g., adjusting volume of current clip)
+            if (audioSource.clip != newClip) {
+                audioSource.Stop();
             }
         } else if (!audioSource.isPlaying && newClip != null) {
-             initialVolumeForFadeOut = 0f; // If not playing, we're fading in from 0
+             initialVolumeForFadeOut = 0f; 
         }
 
 
         audioSource.clip = newClip;
-        if (!audioSource.isPlaying) // Ensure it plays if it was stopped or not playing
+        if (!audioSource.isPlaying && newClip != null) // Ensure it plays if it was stopped or not playing
         {
             audioSource.Play();
         }
 
+        // Determine target volume for the new clip
+        float targetFadeInVolume = GetTargetVolumeForClip(newClip);
+        
         // Fade in the new music
         timer = 0f; // Reset timer for fade in
-        float targetFadeInVolume = 1.0f; // Default target volume for new clip is full volume
-
-        // If the previous clip was playing at a certain volume, we might want to fade in to that,
-        // but typically, new music comes in at full volume. For simplicity, always fade to 1.0f.
-        // If specific start volumes are needed, this logic would be more complex.
-
-        float currentVolumeForFadeIn = audioSource.volume; // Current volume before fade-in starts (could be 0 or partial from previous fade)
+        float currentVolumeForFadeIn = audioSource.volume; 
 
         while (timer < fadeDuration)
         {
@@ -195,9 +195,30 @@ public class musicManager : MonoBehaviour
             timer += Time.deltaTime;
             yield return null;
         }
-        audioSource.volume = targetFadeInVolume; // Ensure it reaches the target volume
+        audioSource.volume = targetFadeInVolume; 
 
-        currentFadeCoroutine = null; // Mark fade as complete
+        currentFadeCoroutine = null; 
+    }
+
+    private float GetTargetVolumeForClip(AudioClip clip)
+    {
+        if (clip == passiveMusic)
+        {
+            return PASSIVE_MUSIC_VOLUME;
+        }
+        else if (clip == chaseMusic)
+        {
+            return CHASE_MUSIC_VOLUME;
+        }
+        else
+        {
+            // Default volume for any other clip
+            if (clip != null)
+            {
+                Debug.LogWarning($"GetTargetVolumeForClip: Clip '{clip.name}' is not specifically passive or chase. Defaulting target volume to 1.0f.");
+            }
+            return 1.0f; 
+        }
     }
 
     public void PlayPassiveMusicInstantly()
@@ -210,7 +231,7 @@ public class musicManager : MonoBehaviour
         if (currentFadeCoroutine != null) StopCoroutine(currentFadeCoroutine);
         currentFadeCoroutine = null;
         audioSource.clip = passiveMusic;
-        audioSource.volume = 1f;
+        audioSource.volume = PASSIVE_MUSIC_VOLUME; // Use defined passive music volume
         audioSource.Play();
         currentTargetClip = passiveMusic;
     }
@@ -224,9 +245,9 @@ public class musicManager : MonoBehaviour
         }
         if (currentFadeCoroutine != null) StopCoroutine(currentFadeCoroutine);
         currentFadeCoroutine = null;
-        chaseMusicStartTime = Time.time; // Update start time even for instant play
+        chaseMusicStartTime = Time.time; 
         audioSource.clip = chaseMusic;
-        audioSource.volume = 1f;
+        audioSource.volume = CHASE_MUSIC_VOLUME; // Use defined chase music volume
         audioSource.Play();
         currentTargetClip = chaseMusic;
     }
