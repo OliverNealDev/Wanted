@@ -9,6 +9,7 @@ TagManager:
   - Tree
   - berryBush
   - WorldCanvas
+  - proceduralMap
   layers:
   - Default
   - TransparentFX

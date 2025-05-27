@@ -28,7 +28,7 @@ public class lawEnforcementManager : MonoBehaviour
     {
         player = GameObject.FindGameObjectWithTag("Player");
         InvokeRepeating("SpawnPoliceCar", 1f, 30.44f);
-        InvokeRepeating("SpawnPoliceHelicopter", 60f, 20.4f);
+        InvokeRepeating("SpawnPoliceHelicopter", 1f, 25.4f);
         
         detectionSlider.value = detectionPercentage;
     }
@@ -108,7 +108,7 @@ public class lawEnforcementManager : MonoBehaviour
     {
         policeCarsSpawned++;
         Instantiate(policeCarPrefab, policeCarSpawnPoint, Quaternion.identity);
-        if (policeCarsSpawned > 3)
+        if (policeCarsSpawned > 5)
         {
             CancelInvoke(nameof(SpawnPoliceCar));
         }

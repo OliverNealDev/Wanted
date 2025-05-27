@@ -25,7 +25,7 @@ public class proceduralMap : MonoBehaviour
             autoBake.instance.Bake();
         }
         
-        if (bushObjects.Count < 60)
+        if (bushObjects.Count < 30)
         {
             GenerateBush();
         }
@@ -62,7 +62,7 @@ public class proceduralMap : MonoBehaviour
         treeObjects.Add(tree);
     }
 
-    void GenerateBush()
+    public void GenerateBush()
     {
         bool randomBool = Random.Range(0f, 1f) < 0.5f;
         if (randomBool)
@@ -76,6 +76,8 @@ public class proceduralMap : MonoBehaviour
         
         for (int i = 0; i < bushObjects.Count; i++)
         {
+            if (!bushObjects[i]) continue;
+            
             if (Vector2.Distance(bushObjects[i].transform.position, position) < 2.5f)
             {
                 return; // Too close to another bush, don't spawn

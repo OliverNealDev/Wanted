@@ -23,6 +23,8 @@ public class cherryController : MonoBehaviour
     private bool isInteractablePromptActive = false;
     [SerializeField] private float minOuterRadiusForPrompt = 1f; // Minimum radius to show the prompt
     private GameObject thisCherryInteractablePrompt;
+    
+    private proceduralMap _proceduralMap;
 
     // This will hold the GameObject that the spotLight is attached to.
     // This is the object that will be turned on/off.
@@ -30,6 +32,7 @@ public class cherryController : MonoBehaviour
 
     void Start()
     {
+        _proceduralMap =  GameObject.FindGameObjectWithTag("proceduralMap").GetComponent<proceduralMap>();
         player = GameObject.FindGameObjectWithTag("Player");
         worldCanvas = GameObject.FindGameObjectWithTag("WorldCanvas");
         
@@ -89,6 +92,7 @@ public class cherryController : MonoBehaviour
                 if (pc != null)
                 {
                     pc.cherryConsumed();
+                    _proceduralMap.GenerateBush();
                 }
                 else
                 {
