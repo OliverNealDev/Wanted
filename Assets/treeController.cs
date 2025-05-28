@@ -54,7 +54,10 @@ public class treeController : MonoBehaviour
             {
                 StopCoroutine(activeFadeCoroutine);
             }
-            activeFadeCoroutine = StartCoroutine(FadeOpacity(1.0f));
+            if (gameObject.activeInHierarchy) 
+            {
+                activeFadeCoroutine = StartCoroutine(FadeOpacity(1.0f));
+            }
         }
     }
 

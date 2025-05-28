@@ -27,8 +27,12 @@ public class policeOfficerController : MonoBehaviour
     [Header("Equipment Settings")]
     [SerializeField] private GameObject proximityMinePrefab;
     [SerializeField] private int proximityMineCount = 1;
-    [SerializeField] private float minimumCooldownTime = 30f;
-    [SerializeField] private float maximumCooldownTime = 90f;
+    [SerializeField] private float proximityMineMinimumCooldownTime = 30f;
+    [SerializeField] private float proximityMineMaximumCooldownTime = 90f;
+    
+    [SerializeField] private GameObject radarPrefab;
+    [SerializeField] private float radarMinimumCooldownTime = 90f;
+    [SerializeField] private float radarMaximumCooldownTime = 180f;
 
     [Header("Raycast Settings")]
     [SerializeField] private LayerMask visionObstructingLayers;
@@ -143,7 +147,11 @@ public class policeOfficerController : MonoBehaviour
         SetNewSweepInterval();
         if (proximityMineCount > 0 && proximityMinePrefab != null)
         {
-            Invoke("placeProximityMine", Random.Range(minimumCooldownTime, maximumCooldownTime));
+            Invoke("placeProximityMine", Random.Range(proximityMineMinimumCooldownTime, proximityMineMaximumCooldownTime));
+        }
+        if (radarPrefab != null)
+        {
+            Invoke("placeRadar", Random.Range(radarMinimumCooldownTime, radarMaximumCooldownTime));
         }
         else if (proximityMinePrefab == null && proximityMineCount > 0)
         {
@@ -434,8 +442,25 @@ public class policeOfficerController : MonoBehaviour
 
         if (proximityMineCount > 0 && proximityMinePrefab != null) 
         {
-            float cooldown = Random.Range(minimumCooldownTime, maximumCooldownTime);
+            float cooldown = Random.Range(proximityMineMinimumCooldownTime, proximityMineMaximumCooldownTime);
             Invoke("placeProximityMine", cooldown);
+        }
+    }
+
+    void placeRadar()
+    {
+        if (isTimeFrozen) return; // Don't place mines if time is frozen
+
+        if (radarPrefab != null && GameObject.FindGameObjectWithTag("radar") == null)
+        {
+            Vector2 radarPosition = (Vector2)transform.position + Random.insideUnitCircle * 1f;
+            Instantiate(radarPrefab, radarPosition, Quaternion.identity);
+        }
+
+        if (radarPrefab != null) 
+        {
+            float cooldown = Random.Range(radarMinimumCooldownTime, radarMaximumCooldownTime);
+            Invoke("placeRadar", cooldown);
         }
     }
 

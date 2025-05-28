@@ -28,7 +28,7 @@ public class policeCarController : MonoBehaviour
     [SerializeField] private AudioClip parkingClip;
 
     private float timeAlive = 0f;
-    private const float selfDestructTimeout = 20f;
+    private const float selfDestructTimeout = 30f;
 
     void Start()
     {
@@ -75,6 +75,7 @@ public class policeCarController : MonoBehaviour
             timeAlive += Time.deltaTime;
             if (timeAlive > selfDestructTimeout)
             {
+                lawEnforcementManager.SpawnPoliceCar();
                 Destroy(gameObject);
                 return;
             }

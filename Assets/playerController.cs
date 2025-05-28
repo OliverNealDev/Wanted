@@ -26,6 +26,13 @@ public class playerController : MonoBehaviour
     private SpriteRenderer spriteRenderer;
 
     public List<GameObject> foliageUnder = new List<GameObject>();
+    
+    [Header("Melee Settings")]
+    [SerializeField] private float meleeRange = 0.5f;
+    [SerializeField] private float knockbackForce = 1f;
+    [SerializeField] private float meleeCooldown = 0.5f;
+    [SerializeField] private float meleeCooldownTimer = 0f;
+    [SerializeField] private GameObject playerHand;
 
     void Start()
     {
@@ -41,6 +48,8 @@ public class playerController : MonoBehaviour
 
     void Update()
     {
+        meleeCooldownTimer += Time.deltaTime;
+        
         bool isTryingToSprint = Input.GetKey(KeyCode.LeftShift) && _currentStamina > 0;
 
         if (isTryingToSprint)
@@ -64,6 +73,12 @@ public class playerController : MonoBehaviour
         if (Input.GetKey(KeyCode.S)) _movementInput.y -= 1;
         if (Input.GetKey(KeyCode.A)) _movementInput.x -= 1;
         if (Input.GetKey(KeyCode.D)) _movementInput.x += 1;
+
+        /*if (Input.GetKeyDown(KeyCode.Mouse0) && meleeCooldownTimer >= meleeCooldown)
+        {
+            meleeCooldownTimer = 0f;
+            Instantiate(playerHand, transform.position, Quaternion.identity);
+        }*/
 
         if (_movementInput.magnitude > 1)
         {

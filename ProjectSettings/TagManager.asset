@@ -10,6 +10,7 @@ TagManager:
   - berryBush
   - WorldCanvas
   - proceduralMap
+  - radar
   layers:
   - Default
   - TransparentFX

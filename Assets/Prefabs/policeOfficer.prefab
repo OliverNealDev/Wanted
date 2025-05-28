@@ -323,14 +323,17 @@ MonoBehaviour:
   sweepOscillationSpeed: 1
   proximityMinePrefab: {fileID: 2056279179789386527, guid: 6a23936785953b94686667989dcff81a, type: 3}
   proximityMineCount: 1
-  minimumCooldownTime: 60
-  maximumCooldownTime: 120
+  proximityMineMinimumCooldownTime: 60
+  proximityMineMaximumCooldownTime: 90
+  radarPrefab: {fileID: 6083744807834001625, guid: 6cc48b064338e53498d243be978a04ba, type: 3}
+  radarMinimumCooldownTime: 120
+  radarMaximumCooldownTime: 150
   visionObstructingLayers:
     serializedVersion: 2
     m_Bits: 34816
   raycastOriginOffset: {x: 0, y: 0}
   lkpSampleRadius: 0.1
-  playerTouchDistance: 0.8
+  playerTouchDistance: 0.9
 --- !u!195 &8087418043640440310
 NavMeshAgent:
   m_ObjectHideFlags: 0

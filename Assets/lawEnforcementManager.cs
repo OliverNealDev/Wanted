@@ -28,7 +28,7 @@ public class lawEnforcementManager : MonoBehaviour
     {
         player = GameObject.FindGameObjectWithTag("Player");
         InvokeRepeating("SpawnPoliceCar", 1f, 30.44f);
-        InvokeRepeating("SpawnPoliceHelicopter", 1f, 25.4f);
+        InvokeRepeating("SpawnPoliceHelicopter", 60f, 25.4f);
         
         detectionSlider.value = detectionPercentage;
     }
@@ -57,7 +57,7 @@ public class lawEnforcementManager : MonoBehaviour
         {
             detectionPercentage = 1f;
             detectionSlider.value = detectionPercentage;
-            //AlertSpottedTransform(new Vector2(player.transform.position.x, player.transform.position.y));
+            AlertSpottedTransform(new Vector2(player.transform.position.x, player.transform.position.y));
         }
         else
         {
@@ -84,7 +84,7 @@ public class lawEnforcementManager : MonoBehaviour
 
         var sortedOfficers = officersWithDistances.OrderBy(o => o.distance).ToList();
 
-        int officersToAlertCount = Mathf.CeilToInt(policeOfficers.Count * 0.25f);
+        int officersToAlertCount = Mathf.CeilToInt(policeOfficers.Count * 0.1f);
         officersToAlertCount = Mathf.Min(officersToAlertCount, sortedOfficers.Count);
 
         var closestOfficers = sortedOfficers.Take(officersToAlertCount);
@@ -104,7 +104,7 @@ public class lawEnforcementManager : MonoBehaviour
         }
     }
     
-    void SpawnPoliceCar()
+    public void SpawnPoliceCar()
     {
         policeCarsSpawned++;
         Instantiate(policeCarPrefab, policeCarSpawnPoint, Quaternion.identity);
