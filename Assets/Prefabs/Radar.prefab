@@ -284,6 +284,8 @@ MonoBehaviour:
   timeToScan: 60
   timeToDisable: 0
   pingEffectPrefab: {fileID: 6835300920777106900}
+  radarSlider: {fileID: 0}
+  radarSliderObject: {fileID: 683834398747000710, guid: 3e8ad1c07298452408e68ec7c93bdb0b, type: 3}
   radarInteractablePrompt: {fileID: 5463750135855680706, guid: 082c46df293c2ab49bda919d06941650, type: 3}
   minOuterRadiusForPrompt: 1
 --- !u!58 &8172932725511947000

@@ -13,6 +13,7 @@ TagManager:
   - radar
   - radarPanel
   - radarTimer
+  - Canvas
   layers:
   - Default
   - TransparentFX

@@ -2,6 +2,8 @@ using System.IO.Compression;
 using UnityEngine;
 using System.Collections;
 using TMPro;
+using UnityEngine.UIElements;
+using Slider = UnityEngine.UI.Slider;
 
 public class radarController : MonoBehaviour
 {
@@ -11,19 +13,24 @@ public class radarController : MonoBehaviour
     [SerializeField] private float timeToDisable;
 
     [SerializeField] private GameObject pingEffectPrefab;
-    [SerializeField] private GameObject RadarPanel;
-    [SerializeField] private TextMeshProUGUI RadarTimer;
-
+    //[SerializeField] private GameObject RadarPanel;
+    //[SerializeField] private TextMeshProUGUI RadarTimer;
+    [SerializeField] private Slider radarSlider;
+    [SerializeField] private GameObject radarSliderObject;
+    private float timePassed = 0;
+    
     private GameObject Player;
     private GameObject worldCanvas;
+    private GameObject Canvas;
     [SerializeField] private GameObject radarInteractablePrompt;
     private bool isInteractablePromptActive = false;
     [SerializeField] private float minOuterRadiusForPrompt = 1f;
     private GameObject thisRadarInteractablePrompt;
-
+    
     lawEnforcementManager lawEnforcementManager;
 
     private AudioSource audioSource;
+    private GameObject spawnedRadarSliderObject;
     
     private bool isDisabled = false;
 
@@ -31,29 +38,43 @@ public class radarController : MonoBehaviour
     {
         Player = GameObject.FindGameObjectWithTag("Player");
         worldCanvas = GameObject.FindGameObjectWithTag("WorldCanvas");
+        Canvas = GameObject.FindGameObjectWithTag("Canvas");
         lawEnforcementManager = FindObjectOfType<lawEnforcementManager>();
         audioSource = GetComponent<AudioSource>();
+        
+        spawnedRadarSliderObject = Instantiate(radarSliderObject, Canvas.transform);
+        radarSlider = spawnedRadarSliderObject.GetComponent<Slider>();
+        
+        //RadarPanel = GameObject.FindGameObjectWithTag("radarPanel");
+        //RadarTimer = GameObject.FindGameObjectWithTag("radarTimer").GetComponent<TextMeshProUGUI>();
+        //RadarPanel.transform.position = new Vector2(965.1453f, 153.4f);
 
-        int radarProgressiveDifficulty = lawEnforcementManager.radarsSpawned * 5;
-        timeToScan -= radarProgressiveDifficulty;
+        timeToScan -= (lawEnforcementManager.timePassed / 10f) - 12; // The 12 is compensation as radars don't spawn until 2 minutes in (12 seconds worth)
+        Debug.Log(timeToScan);
         if (timeToScan < 20f)
         {
             timeToScan = 20f; // Ensure minimum scan time
         }
 
-        if (!RadarPanel.activeSelf)
+        lawEnforcementManager.radarsSpawned++;
+
+        /*if (!radarSlider.gameObject.activeInHierarchy)
         {
-            RadarPanel.SetActive(true);
-            RadarTimer.text = timeToScan.ToString();
-        }
+            radarSlider.gameObject.SetActive(true);
+        }*/
+
+        lawEnforcementManager.timeSinceRadarSpawned = 0;
+        lawEnforcementManager.RadarCooldown = timeToScan + 4;
         
-        Invoke("Scan", timeToScan);
+        //Invoke("Scan", timeToScan);
         InvokeRepeating("sonarPing", 1f, 2f);
     }
 
     void Update()
     {
         if (isDisabled) return;
+        
+        timePassed += Time.deltaTime;
         
         radarBit.transform.Rotate(0, 0, radarBitRotationSpeed * Time.deltaTime, Space.Self);
 
@@ -101,7 +122,7 @@ public class radarController : MonoBehaviour
         {
             isInteractablePromptActive = true;
 
-            Vector3 worldOffset = new Vector3(0f, 0.5f, 0f);
+            Vector3 worldOffset = new Vector3(0f, 7f, 0f);
             Vector3 targetPromptWorldPosition = transform.position + worldOffset;
 
             if (radarInteractablePrompt != null && worldCanvas != null)
@@ -135,7 +156,12 @@ public class radarController : MonoBehaviour
             audioSource.Play();
         }
 
-        RadarTimer.text = timeToScan.ToString();
+        //RadarTimer.text = timeToScan.ToString();
+        radarSlider.value = timePassed / timeToScan;
+        if (radarSlider.value == 1)
+        {
+            Scan();
+        }
         
         if (pingEffectPrefab != null)
         {
@@ -187,7 +213,13 @@ public class radarController : MonoBehaviour
            lawEnforcementManager.ChangeDetectionPercentage(1);
         }
         
-        RadarTimer.text = "REVEALED";
+        if (thisRadarInteractablePrompt != null)
+        {
+            Destroy(thisRadarInteractablePrompt);
+        }
+        
+        //RadarTimer.text = "REVEALED";
+        radarSlider.value = 1;
         
         isDisabled = true;
         //StopAllCoroutines();
@@ -197,8 +229,13 @@ public class radarController : MonoBehaviour
 
     void Despawn()
     {
-        RadarTimer.text = "";
-        RadarPanel.SetActive(false);
+        //RadarTimer.text = "";
+        //RadarPanel.transform.position = new Vector2(965.1453f, 1530.4f);
+        Destroy(spawnedRadarSliderObject);
+        if (thisRadarInteractablePrompt != null)
+        {
+            Destroy(thisRadarInteractablePrompt);
+        }
         Destroy(gameObject);
     }
 }

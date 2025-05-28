@@ -22,6 +22,9 @@ public class lawEnforcementManager : MonoBehaviour
     [SerializeField] private float detectionDecreaseRate = 0.1f;
     private int policeCarsSpawned = 0;
     public int radarsSpawned = 0;
+    public float timePassed { get; private set; } = 0f;
+    public float timeSinceRadarSpawned = 0f;
+    public float RadarCooldown = 0f;
 
     private GameObject player;
     
@@ -36,6 +39,9 @@ public class lawEnforcementManager : MonoBehaviour
     
     void Update()
     {
+        timePassed += Time.deltaTime;
+        timeSinceRadarSpawned += Time.deltaTime;
+        
         timeSinceLastDetectionIncrease += Time.deltaTime;
         if (timeSinceLastDetectionIncrease > 3 && detectionPercentage > 0f)
         {

@@ -451,7 +451,7 @@ public class policeOfficerController : MonoBehaviour
     {
         if (isTimeFrozen) return; // Don't place mines if time is frozen
 
-        if (radarPrefab != null && GameObject.FindGameObjectWithTag("radar") == null)
+        if (radarPrefab != null && GameObject.FindGameObjectWithTag("radar") == null && lawEnforcementManager.timeSinceRadarSpawned >= lawEnforcementManager.RadarCooldown && lawEnforcementManager.timePassed >= 120)
         {
             Vector2 radarPosition = (Vector2)transform.position + Random.insideUnitCircle * 1f;
             Instantiate(radarPrefab, radarPosition, Quaternion.identity);

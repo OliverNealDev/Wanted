@@ -128,7 +128,7 @@ public class cherryController : MonoBehaviour
         {
             isInteractablePromptActive = true;
 
-            Vector3 worldOffset = new Vector3(0f, 0.5f, 0f); 
+            Vector3 worldOffset = new Vector3(0f, 7f, 0f); 
             Vector3 targetPromptWorldPosition = transform.position + worldOffset;
 
             if (cherryInteractablePrompt != null && worldCanvas != null)
