@@ -11,6 +11,8 @@ TagManager:
   - WorldCanvas
   - proceduralMap
   - radar
+  - radarPanel
+  - radarTimer
   layers:
   - Default
   - TransparentFX

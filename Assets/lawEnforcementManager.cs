@@ -21,6 +21,7 @@ public class lawEnforcementManager : MonoBehaviour
     private float timeSinceLastDetectionIncrease = 0f;
     [SerializeField] private float detectionDecreaseRate = 0.1f;
     private int policeCarsSpawned = 0;
+    public int radarsSpawned = 0;
 
     private GameObject player;
     

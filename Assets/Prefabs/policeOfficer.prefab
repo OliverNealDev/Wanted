@@ -326,8 +326,8 @@ MonoBehaviour:
   proximityMineMinimumCooldownTime: 60
   proximityMineMaximumCooldownTime: 90
   radarPrefab: {fileID: 6083744807834001625, guid: 6cc48b064338e53498d243be978a04ba, type: 3}
-  radarMinimumCooldownTime: 120
-  radarMaximumCooldownTime: 150
+  radarMinimumCooldownTime: 12
+  radarMaximumCooldownTime: 15
   visionObstructingLayers:
     serializedVersion: 2
     m_Bits: 34816

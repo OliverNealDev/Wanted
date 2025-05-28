@@ -1,6 +1,7 @@
 using System.IO.Compression;
 using UnityEngine;
 using System.Collections;
+using TMPro;
 
 public class radarController : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class radarController : MonoBehaviour
     [SerializeField] private float timeToDisable;
 
     [SerializeField] private GameObject pingEffectPrefab;
+    [SerializeField] private GameObject RadarPanel;
+    [SerializeField] private TextMeshProUGUI RadarTimer;
 
     private GameObject Player;
     private GameObject worldCanvas;
@@ -31,6 +34,19 @@ public class radarController : MonoBehaviour
         lawEnforcementManager = FindObjectOfType<lawEnforcementManager>();
         audioSource = GetComponent<AudioSource>();
 
+        int radarProgressiveDifficulty = lawEnforcementManager.radarsSpawned * 5;
+        timeToScan -= radarProgressiveDifficulty;
+        if (timeToScan < 20f)
+        {
+            timeToScan = 20f; // Ensure minimum scan time
+        }
+
+        if (!RadarPanel.activeSelf)
+        {
+            RadarPanel.SetActive(true);
+            RadarTimer.text = timeToScan.ToString();
+        }
+        
         Invoke("Scan", timeToScan);
         InvokeRepeating("sonarPing", 1f, 2f);
     }
@@ -119,6 +135,8 @@ public class radarController : MonoBehaviour
             audioSource.Play();
         }
 
+        RadarTimer.text = timeToScan.ToString();
+        
         if (pingEffectPrefab != null)
         {
             GameObject pingInstance = Instantiate(pingEffectPrefab, transform.position, Quaternion.identity);
@@ -169,6 +187,8 @@ public class radarController : MonoBehaviour
            lawEnforcementManager.ChangeDetectionPercentage(1);
         }
         
+        RadarTimer.text = "REVEALED";
+        
         isDisabled = true;
         //StopAllCoroutines();
         CancelInvoke();
@@ -177,6 +197,8 @@ public class radarController : MonoBehaviour
 
     void Despawn()
     {
+        RadarTimer.text = "";
+        RadarPanel.SetActive(false);
         Destroy(gameObject);
     }
 }
