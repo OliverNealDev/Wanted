@@ -4,6 +4,7 @@ using NavMeshPlus.Components;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
@@ -214,8 +215,9 @@ public class policeOfficerController : MonoBehaviour
         if (distanceToPlayer < playerTouchDistance)
         {
             Debug.Log("PLAYER TOUCHED by " + gameObject.name + "! Time Freezing.");
-            Time.timeScale = 0f;
+            Time.timeScale = 0.01f;
             isTimeFrozen = true; // Set the static flag
+            Invoke("restartGame", 0.06f); // Restart the game after a short delay
 
             // Optional: Notify a game manager or trigger a game over sequence
             if (lawEnforcementManager != null)
@@ -230,6 +232,12 @@ public class policeOfficerController : MonoBehaviour
                 agent.velocity = Vector3.zero;
             }
         }
+    }
+
+    void restartGame()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
 
