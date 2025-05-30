@@ -185,6 +185,7 @@ GameObject:
   - component: {fileID: 2256729480715700059}
   - component: {fileID: 8172932725511947000}
   - component: {fileID: 9203078211123397869}
+  - component: {fileID: 4183586566722897608}
   m_Layer: 0
   m_Name: Radar
   m_TagString: radar
@@ -421,6 +422,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &4183586566722897608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6083744807834001625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ada03e6764fc6040942b673aa5c9230, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isMusic: 0
 --- !u!1 &6835300920777106900
 GameObject:
   m_ObjectHideFlags: 0

@@ -222,7 +222,7 @@ public class policeOfficerController : MonoBehaviour
             Debug.Log("PLAYER TOUCHED by " + gameObject.name + "! Time Freezing.");
             Time.timeScale = 0.01f;
             isTimeFrozen = true;
-            Invoke("restartGame", 0.06f);
+            Invoke("restartGame", 0.04f);
 
             if (agent != null && agent.isOnNavMesh)
             {
@@ -235,7 +235,7 @@ public class policeOfficerController : MonoBehaviour
     void restartGame()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene("MainMenu");
     }
 
 

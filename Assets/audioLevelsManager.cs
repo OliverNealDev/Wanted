@@ -15,9 +15,9 @@ public class audioLevelsManager : MonoBehaviour
     {
         //Object.DontDestroyOnLoad(gameObject);
         Instance = this;
-        
-        PlayerPrefs.SetFloat("MusicVolume", musicVolumeSlider.value);
-        PlayerPrefs.SetFloat("SFXVolume", sfxVolumeSlider.value);
+
+        musicVolumeSlider.value = PlayerPrefs.GetFloat("MusicVolume");
+        sfxVolumeSlider.value = PlayerPrefs.GetFloat("SFXVolume");
     }
     
     public void SetMusicVolume()

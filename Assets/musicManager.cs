@@ -132,7 +132,7 @@ public class musicManager : MonoBehaviour
             float expectedVolume = 0f;
             if (newClip == passiveMusic) expectedVolume = PASSIVE_MUSIC_VOLUME;
             else if (newClip == chaseMusic) expectedVolume = CHASE_MUSIC_VOLUME;
-            else expectedVolume = 1.0f; // Default for other clips
+            else expectedVolume = 1; // Default for other clips
 
             // If already playing this clip and volume is close enough to target, don't restart fade.
             if (audioSource.clip == newClip && audioSource.isPlaying && Mathf.Approximately(audioSource.volume, expectedVolume))

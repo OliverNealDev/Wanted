@@ -452,6 +452,7 @@ GameObject:
   - component: {fileID: 2833769646963873505}
   - component: {fileID: 1516216441949942793}
   - component: {fileID: 4093977719271770900}
+  - component: {fileID: 2905976348283158525}
   m_Layer: 11
   m_Name: Tree2
   m_TagString: Tree
@@ -623,3 +624,16 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &2905976348283158525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9064160595605594635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ada03e6764fc6040942b673aa5c9230, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isMusic: 0

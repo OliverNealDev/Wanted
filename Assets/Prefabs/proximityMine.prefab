@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 100664869200163724}
   - component: {fileID: 1019476017582972199}
   - component: {fileID: 5879300276387271877}
+  - component: {fileID: -470464742666034908}
   m_Layer: 9
   m_Name: proximityMine
   m_TagString: Untagged
@@ -331,3 +332,16 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 3
+--- !u!114 &-470464742666034908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2056279179789386527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ada03e6764fc6040942b673aa5c9230, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isMusic: 0
