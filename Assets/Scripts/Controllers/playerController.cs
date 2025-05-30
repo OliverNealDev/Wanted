@@ -6,36 +6,28 @@ using UnityEngine.UI;
 [RequireComponent(typeof(AudioSource))]
 public class playerController : MonoBehaviour
 {
-    [Header("Movement")]
     private float _currentMoveSpeed;
-
     [SerializeField] private float walkSpeed = 5f;
     [SerializeField] private float sprintSpeedMultiplier = 2f;
     [SerializeField] private float maxStamina = 1f;
     [SerializeField] private float staminaDrainRate = 1f;
     [SerializeField] private float _currentStamina = 0.5f;
     [SerializeField] private Slider staminaSlider;
-
     [SerializeField] private float turnSpeed = 5f;
 
-    [Header("Visibility")]
     [SerializeField] private float seenToSpottedTime = 0.4f;
 
     private Camera cam;
     private Vector2 _movementInput;
-
     private SpriteRenderer spriteRenderer;
-
     public List<GameObject> foliageUnder = new List<GameObject>();
     
-    [Header("Melee Settings")]
     [SerializeField] private float meleeRange = 0.5f;
     [SerializeField] private float knockbackForce = 1f;
     [SerializeField] private float meleeCooldown = 0.5f;
     [SerializeField] private float meleeCooldownTimer = 0f;
     [SerializeField] private GameObject playerHand;
 
-    [Header("Audio")]
     [SerializeField] private AudioClip[] footstepSounds;
     [SerializeField] private float walkStepInterval = 0.5f;
     [SerializeField] private float sprintStepInterval = 0.15f; 
@@ -76,7 +68,6 @@ public class playerController : MonoBehaviour
         bool isMoving = _movementInput.magnitude > 0;
         bool isHoldingSprintKey = Input.GetKey(KeyCode.LeftShift);
         bool hasStaminaToSprint = _currentStamina > 0;
-
         bool isActuallySprintingThisFrame = false;
 
         if (isHoldingSprintKey && hasStaminaToSprint && isMoving)
@@ -99,6 +90,10 @@ public class playerController : MonoBehaviour
         if (isMoving)
         {
             transform.Translate(_movementInput * (_currentMoveSpeed * Time.deltaTime), Space.World);
+
+            float angle = Mathf.Atan2(_movementInput.y, _movementInput.x) * Mathf.Rad2Deg - 90f;
+            Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
         }
 
         bool isEffectivelySprintingForAudio = isActuallySprintingThisFrame && isMoving;
@@ -158,19 +153,6 @@ public class playerController : MonoBehaviour
                     staminaSlider.value = _currentStamina;
                 }
             }
-        }
-
-        Vector3 mouseScreenPosition = Input.mousePosition;
-        if (cam != null)
-        {
-            float playerScreenDepth = cam.WorldToScreenPoint(transform.position).z;
-            mouseScreenPosition.z = playerScreenDepth;
-            Vector2 mousePos = cam.ScreenToWorldPoint(mouseScreenPosition);
-
-            Vector2 lookDir = new Vector2(mousePos.x - transform.position.x, mousePos.y - transform.position.y);
-            float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg - 90f;
-            Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
         }
     }
 
