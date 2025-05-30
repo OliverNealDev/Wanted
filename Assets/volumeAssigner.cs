@@ -18,7 +18,7 @@ public class volumeAssigner : MonoBehaviour
             }
         }
         
-        InvokeRepeating("CheckVolume", 0.1f, 0.1f);
+        InvokeRepeating("CheckVolume", 0.025f, 0.1f);
     }
 
     void CheckVolume()

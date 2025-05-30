@@ -7,6 +7,8 @@ public class AspectAndResolutionManager : MonoBehaviour
     private float targetAspect = 16.0f / 9.0f;
     private Camera mainCamera;
 
+    private bool setInitialAudio = false;
+
     void Awake()
     {
         if (Application.platform == RuntimePlatform.WebGLPlayer)
@@ -26,16 +28,23 @@ public class AspectAndResolutionManager : MonoBehaviour
             return; 
         }
 
-        mainCamera = Camera.main;
+        mainCamera = FindAnyObjectByType<Camera>();
         if (mainCamera == null)
         {
             Debug.LogError("AspectAndResolutionManager: Main Camera not found on Awake!");
+        }
+        
+        if (!setInitialAudio)
+        {
+            PlayerPrefs.SetFloat("MusicVolume", 0.125f);
+            PlayerPrefs.SetFloat("SFXVolume", 0.125f);
+            setInitialAudio = true;
         }
     }
 
     void Start()
     {
-        if (Instance != this && Application.platform != RuntimePlatform.WebGLPlayer) return;
+        if (Instance != this) return;
         if (Application.platform == RuntimePlatform.WebGLPlayer) return;
         
         SetInitialResolution(false); 
@@ -79,7 +88,7 @@ public class AspectAndResolutionManager : MonoBehaviour
 
         if (mainCamera == null)
         {
-            mainCamera = Camera.main;
+            mainCamera = FindAnyObjectByType<Camera>();
             if (mainCamera == null)
             {
                 return;
