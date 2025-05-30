@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(AudioSource))]
 public class playerController : MonoBehaviour
 {
     [Header("Movement")]
@@ -34,28 +35,55 @@ public class playerController : MonoBehaviour
     [SerializeField] private float meleeCooldownTimer = 0f;
     [SerializeField] private GameObject playerHand;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip[] footstepSounds;
+    [SerializeField] private float walkStepInterval = 0.5f;
+    [SerializeField] private float sprintStepInterval = 0.15f; 
+    [SerializeField] private float pitchVariation = 0.1f;
+    private AudioSource audioSource;
+    private float footstepTimer = 0f;
+    private bool wasEffectivelySprintingLastFrame = false;
+
     void Start()
     {
         cam = Camera.main;
         spriteRenderer = GetComponent<SpriteRenderer>();
+        audioSource = GetComponent<AudioSource>();
         
         if (staminaSlider != null)
         {
             staminaSlider.maxValue = maxStamina;
             staminaSlider.value = _currentStamina;
         }
+        _currentMoveSpeed = walkSpeed;
     }
 
     void Update()
     {
         meleeCooldownTimer += Time.deltaTime;
         
-        bool isTryingToSprint = Input.GetKey(KeyCode.LeftShift) && _currentStamina > 0;
+        _movementInput = Vector2.zero;
+        if (Input.GetKey(KeyCode.W)) _movementInput.y += 1;
+        if (Input.GetKey(KeyCode.S)) _movementInput.y -= 1;
+        if (Input.GetKey(KeyCode.A)) _movementInput.x -= 1;
+        if (Input.GetKey(KeyCode.D)) _movementInput.x += 1;
 
-        if (isTryingToSprint)
+        if (_movementInput.magnitude > 1)
+        {
+            _movementInput.Normalize();
+        }
+
+        bool isMoving = _movementInput.magnitude > 0;
+        bool isHoldingSprintKey = Input.GetKey(KeyCode.LeftShift);
+        bool hasStaminaToSprint = _currentStamina > 0;
+
+        bool isActuallySprintingThisFrame = false;
+
+        if (isHoldingSprintKey && hasStaminaToSprint && isMoving)
         {
             _currentMoveSpeed = walkSpeed * sprintSpeedMultiplier;
             _currentStamina -= staminaDrainRate * Time.deltaTime;
+            isActuallySprintingThisFrame = true;
         }
         else
         {
@@ -68,24 +96,39 @@ public class playerController : MonoBehaviour
             staminaSlider.value = _currentStamina;
         }
 
-        _movementInput = Vector2.zero;
-        if (Input.GetKey(KeyCode.W)) _movementInput.y += 1;
-        if (Input.GetKey(KeyCode.S)) _movementInput.y -= 1;
-        if (Input.GetKey(KeyCode.A)) _movementInput.x -= 1;
-        if (Input.GetKey(KeyCode.D)) _movementInput.x += 1;
-
-        /*if (Input.GetKeyDown(KeyCode.Mouse0) && meleeCooldownTimer >= meleeCooldown)
+        if (isMoving)
         {
-            meleeCooldownTimer = 0f;
-            Instantiate(playerHand, transform.position, Quaternion.identity);
-        }*/
-
-        if (_movementInput.magnitude > 1)
-        {
-            _movementInput.Normalize();
+            transform.Translate(_movementInput * (_currentMoveSpeed * Time.deltaTime), Space.World);
         }
 
-        transform.Translate(_movementInput * (_currentMoveSpeed * Time.deltaTime), Space.World);
+        bool isEffectivelySprintingForAudio = isActuallySprintingThisFrame && isMoving;
+
+        if (isMoving)
+        {
+            footstepTimer -= Time.deltaTime;
+
+            if (isEffectivelySprintingForAudio && !wasEffectivelySprintingLastFrame)
+            {
+                PlayFootstepSound();
+                footstepTimer = sprintStepInterval;
+            }
+            else if (!isEffectivelySprintingForAudio && wasEffectivelySprintingLastFrame)
+            {
+                PlayFootstepSound();
+                footstepTimer = walkStepInterval;
+            }
+            else if (footstepTimer <= 0f)
+            {
+                PlayFootstepSound();
+                footstepTimer = isEffectivelySprintingForAudio ? sprintStepInterval : walkStepInterval;
+            }
+        }
+        else
+        {
+            footstepTimer = 0f; 
+        }
+        
+        wasEffectivelySprintingLastFrame = isEffectivelySprintingForAudio;
 
         if (Input.GetKeyDown(KeyCode.E))
         {
@@ -128,6 +171,20 @@ public class playerController : MonoBehaviour
             float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg - 90f;
             Quaternion targetRotation = Quaternion.AngleAxis(angle, Vector3.forward);
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+        }
+    }
+
+    void PlayFootstepSound()
+    {
+        if (audioSource != null && footstepSounds != null && footstepSounds.Length > 0)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, footstepSounds.Length);
+            AudioClip stepSound = footstepSounds[randomIndex];
+            if (stepSound != null)
+            {
+                audioSource.pitch = 1f + UnityEngine.Random.Range(-pitchVariation, pitchVariation);
+                audioSource.PlayOneShot(stepSound);
+            }
         }
     }
 

@@ -7,7 +7,7 @@ public class devVisibility : MonoBehaviour
     void Start()
     {
         textMesh = GetComponent<TextMeshProUGUI>();
-        textMesh.enabled = true;
+        textMesh.enabled = false;
     }
     
     void Update()

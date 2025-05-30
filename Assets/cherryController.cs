@@ -1,11 +1,12 @@
 using System;
 using UnityEngine;
-using UnityEngine.Rendering.Universal; // Required for Light2D
+using UnityEngine.Rendering.Universal;
+using UnityEngine.Serialization; // Required for Light2D
 
 public class cherryController : MonoBehaviour
 {
     [Header("Light Settings")]
-    [SerializeField] private Light2D spotLight; // Assign your Light2D component (expected on a child GameObject) here in the Inspector
+    [SerializeField] private Light2D spotLight; // Assign your Light2D component here
     [SerializeField] private float lightActivationDistance = 22f; // Distance to turn light on/off
 
     [Header("Pulse Parameters")]
@@ -25,65 +26,76 @@ public class cherryController : MonoBehaviour
     private GameObject thisCherryInteractablePrompt;
     
     private proceduralMap _proceduralMap;
-
-    // This will hold the GameObject that the spotLight is attached to.
-    // This is the object that will be turned on/off.
-    private GameObject lightHolderObject; 
+    
+    private AudioSource _audioSource;
+    [SerializeField] private GameObject cherrySoundObject;
+    [SerializeField] private AudioClip promptSound;
+    
+    // Removed: private GameObject lightHolderObject; 
+    // We will now directly control the spotLight component's enabled state.
 
     void Start()
     {
         _proceduralMap =  GameObject.FindGameObjectWithTag("proceduralMap").GetComponent<proceduralMap>();
         player = GameObject.FindGameObjectWithTag("Player");
         worldCanvas = GameObject.FindGameObjectWithTag("WorldCanvas");
+        _audioSource = GetComponent<AudioSource>();
         
         if (spotLight == null)
         {
             Debug.LogError("CherryController: 'spotLight' has not been assigned in the Inspector on " + gameObject.name + ". Light functionality will be disabled.", this);
-            // lightHolderObject will remain null.
         }
         else
         {
-            lightHolderObject = spotLight.gameObject; 
-            if (lightHolderObject == this.gameObject)
+            // Check if the Light2D is on the same GameObject as this script
+            if (spotLight.gameObject == this.gameObject)
             {
+                // Updated warning: The script now handles this case by toggling the component, not the GameObject.
                 Debug.LogWarning("CherryController: 'spotLight' is attached to the same GameObject as this script (" + gameObject.name + "). " +
-                                 "Turning it off based on distance will also disable this script. " +
-                                 "If you intend to turn off only a light visual, ensure the Light2D is on a child GameObject and assign that Light2D component to the 'spotLight' field.", this);
+                                 "The script will toggle the Light2D component's 'enabled' state directly to prevent disabling itself. " +
+                                 "For cleaner organization, or if other components on a dedicated light object also need toggling with distance, " +
+                                 "consider placing the Light2D on a child GameObject and assigning that Light2D component to the 'spotLight' field.", this);
             }
+            // No specific warning needed if it's on a different GameObject (e.g., a child), 
+            // as toggling spotLight.enabled will work correctly for that setup too.
         }
     }
 
     void Update()
     {
-        // --- Light GameObject Activation/Deactivation based on player distance ---
-        if (player != null && lightHolderObject != null) // Ensure player exists and light object is set
+        // --- Light Component Activation/Deactivation based on player distance ---
+        if (player != null && spotLight != null) // Ensure player and Light2D component exist
         {
             float distanceToPlayer = Vector2.Distance(player.transform.position, transform.position);
-            bool shouldLightBeActive = distanceToPlayer <= lightActivationDistance;
+            bool shouldLightBeEnabled = distanceToPlayer <= lightActivationDistance;
 
-            // Only change active state if it's different from the current state to avoid unnecessary calls
-            if (lightHolderObject.activeSelf != shouldLightBeActive)
+            // Only change enabled state if it's different from the current state to avoid unnecessary calls
+            if (spotLight.enabled != shouldLightBeEnabled)
             {
-                lightHolderObject.SetActive(shouldLightBeActive);
+                spotLight.enabled = shouldLightBeEnabled;
+            }
+
+            // --- Light Pulsing Effect ---
+            // Only attempt to pulse if the spotLight component is assigned AND it is currently enabled
+            // The spotLight != null check is implicitly covered by the outer 'if' condition.
+            if (spotLight.enabled) 
+            {
+                pulseTimer += Time.deltaTime * pulseSpeed;
+
+                // Mathf.Sin returns values between -1 and 1. We map this to 0-1.
+                float oscillationFactor = (Mathf.Sin(pulseTimer) + 1f) / 2f; 
+
+                float currentOuterRadius = Mathf.Lerp(minOuterRadius, maxOuterRadius, oscillationFactor);
+                spotLight.pointLightOuterRadius = currentOuterRadius;
+
+                float currentIntensity = Mathf.Lerp(minIntensity, maxIntensity, oscillationFactor);
+                spotLight.intensity = currentIntensity;
             }
         }
-
-        // --- Light Pulsing Effect ---
-        // Only attempt to pulse if the spotLight component is assigned AND its GameObject is currently active
-        if (spotLight != null && lightHolderObject != null && lightHolderObject.activeSelf)
-        {
-            pulseTimer += Time.deltaTime * pulseSpeed;
-
-            float oscillationFactor = (Mathf.Sin(pulseTimer) + 1f) / 2f;
-
-            float currentOuterRadius = Mathf.Lerp(minOuterRadius, maxOuterRadius, oscillationFactor);
-            spotLight.pointLightOuterRadius = currentOuterRadius;
-
-            float currentIntensity = Mathf.Lerp(minIntensity, maxIntensity, oscillationFactor);
-            spotLight.intensity = currentIntensity;
-        }
+        // If player or spotLight is null, or if spotLight is disabled by distance, light logic (including pulsing) won't execute.
 
         // --- Interaction Logic ---
+        // This part remains unchanged as it's not directly related to the light activation bug.
         if (Input.GetKeyDown(KeyCode.E) && isInteractablePromptActive)
         {
             if (player != null)
@@ -91,8 +103,16 @@ public class cherryController : MonoBehaviour
                 playerController pc = player.GetComponent<playerController>();
                 if (pc != null)
                 {
+                    Instantiate(cherrySoundObject, transform.position, Quaternion.identity);
                     pc.cherryConsumed();
-                    _proceduralMap.GenerateBush();
+                    if (_proceduralMap != null) // Good practice to check if _proceduralMap is assigned
+                    {
+                        _proceduralMap.GenerateBush();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("CherryController: '_proceduralMap' is not assigned. Cannot generate bush.", this);
+                    }
                 }
                 else
                 {
@@ -114,11 +134,9 @@ public class cherryController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // This logic remains unchanged.
         if (player == null) 
         {
-            // Optionally, try to find player again if it was not found in Start, or just return.
-            // player = GameObject.FindGameObjectWithTag("Player"); 
-            // if (player == null) return;
             return; 
         }
 
@@ -126,6 +144,8 @@ public class cherryController : MonoBehaviour
 
         if (!isInteractablePromptActive && distanceToPlayer < minOuterRadiusForPrompt)
         {
+            _audioSource.clip = promptSound;
+            _audioSource.Play();
             isInteractablePromptActive = true;
 
             Vector3 worldOffset = new Vector3(0f, 7f, 0f); 

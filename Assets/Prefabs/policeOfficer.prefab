@@ -315,12 +315,14 @@ MonoBehaviour:
   target: {x: 0, y: 0}
   rotationSpeed: 8
   patrolSpeed: 2
-  chaseSpeed: 4
+  chaseSpeed: 3.8
   minSweepInterval: 3
   maxSweepInterval: 10
   sweepDuration: 6
   maxSweepAngle: 120
   sweepOscillationSpeed: 1
+  chaseFlashlightColor: {r: 1, g: 0, b: 0, a: 1}
+  chaseFlashlightIntensityMultiplier: 2
   proximityMinePrefab: {fileID: 2056279179789386527, guid: 6a23936785953b94686667989dcff81a, type: 3}
   proximityMineCount: 1
   proximityMineMinimumCooldownTime: 60

@@ -25,6 +25,10 @@ public class policeOfficerController : MonoBehaviour
     [SerializeField] private float maxSweepAngle = 20f;
     [SerializeField] private float sweepOscillationSpeed = 1.5f;
 
+    [Header("Flashlight Alert Settings")]
+    [SerializeField] private Color chaseFlashlightColor = Color.red;
+    [SerializeField] private float chaseFlashlightIntensityMultiplier = 2f;
+
     [Header("Equipment Settings")]
     [SerializeField] private GameObject proximityMinePrefab;
     [SerializeField] private int proximityMineCount = 1;
@@ -38,10 +42,10 @@ public class policeOfficerController : MonoBehaviour
     [Header("Raycast Settings")]
     [SerializeField] private LayerMask visionObstructingLayers;
     [SerializeField] private Vector2 raycastOriginOffset = new Vector2(0, 0.5f);
-    [SerializeField] private float lkpSampleRadius = 1.0f; // How far around LKP to search for a valid NavMesh point
+    [SerializeField] private float lkpSampleRadius = 1.0f;
 
-    [Header("Capture Settings")] // New Header for touch settings
-    [SerializeField] private float playerTouchDistance = 0.75f; // Distance to consider a "touch"
+    [Header("Capture Settings")]
+    [SerializeField] private float playerTouchDistance = 0.75f;
 
     private Light2D officerFlashlight;
     NavMeshAgent agent;
@@ -65,15 +69,14 @@ public class policeOfficerController : MonoBehaviour
     private bool canSeePlayerCurrentFrame;
     private bool hasReachedLKPInCurrentSearch = false;
     
-    // Flag to ensure time freeze logic runs only once
     private static bool isTimeFrozen = false;
+
+    private Color originalFlashlightColor;
+    private float originalFlashlightIntensity;
 
 
     void Start()
     {
-        // Reset time scale at the start of the game or scene,
-        // in case it was frozen from a previous session (especially in editor)
-        // A dedicated GameManager is a better place for this generally.
         Time.timeScale = 1f;
         isTimeFrozen = false;
 
@@ -97,13 +100,19 @@ public class policeOfficerController : MonoBehaviour
             {
                 Debug.LogError("No Light2D component found on the first child of '" + gameObject.name + "'.");
             }
+            else
+            {
+                originalFlashlightColor = officerFlashlight.color;
+                originalFlashlightIntensity = officerFlashlight.intensity;
+                officerFlashlight.enabled = false;
+            }
         }
         else
         {
             Debug.LogError("Police officer '" + gameObject.name + "' has no children; cannot find Light2D.");
         }
 
-        float randomSpeedPercentageModifier = Random.Range(0.8f, 1.2f);
+        float randomSpeedPercentageModifier = Random.Range(0.9f, 1.1f);
         patrolSpeed *= randomSpeedPercentageModifier;
         chaseSpeed *= randomSpeedPercentageModifier;
 
@@ -158,28 +167,20 @@ public class policeOfficerController : MonoBehaviour
         {
             Debug.LogWarning("ProximityMinePrefab is not assigned for " + gameObject.name + ", but proximityMineCount is > 0. Officer cannot place mines.");
         }
-
-        if (officerFlashlight != null)
-        {
-            officerFlashlight.enabled = false;
-        }
     }
 
     void Update()
     {
-        // If time is frozen, the officer should essentially do nothing active.
-        if (isTimeFrozen) // Check static flag
+        if (isTimeFrozen)
         {
             if (agent != null && agent.isOnNavMesh && agent.isActiveAndEnabled && !agent.isStopped)
             {
-                agent.isStopped = true; // Explicitly stop the agent
-                agent.velocity = Vector3.zero; // Clear velocity
+                agent.isStopped = true;
+                agent.velocity = Vector3.zero;
             }
-            // Potentially disable flashlight or other visual cues if needed
-            // if (officerFlashlight != null) officerFlashlight.enabled = false;
-            return; // Skip all other update logic
+            UpdateFlashlightStatus();
+            return;
         }
-         // Ensure agent can move if time is not frozen (and it was previously stopped by time freeze)
         else if (agent != null && agent.isOnNavMesh && agent.isActiveAndEnabled && agent.isStopped)
         {
              agent.isStopped = false;
@@ -193,12 +194,16 @@ public class policeOfficerController : MonoBehaviour
                 officerFlashlight.enabled = false;
             }
             canSeePlayerCurrentFrame = false;
+            UpdateFlashlightStatus();
             return;
         }
         
-        // Check for direct touch before other logic, as this is a game-ending condition
         CheckForPlayerTouch();
-        if (isTimeFrozen) return; // If touch happened and froze time, exit early.
+        if (isTimeFrozen)
+        {
+            UpdateFlashlightStatus();
+            return;
+        }
 
         HandleStateTransitions();
         ExecuteCurrentStateBehavior();
@@ -209,23 +214,16 @@ public class policeOfficerController : MonoBehaviour
 
     void CheckForPlayerTouch()
     {
-        if (isTimeFrozen || player == null) return; // Don't check if time already frozen or no player
+        if (isTimeFrozen || player == null) return;
 
         float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
         if (distanceToPlayer < playerTouchDistance)
         {
             Debug.Log("PLAYER TOUCHED by " + gameObject.name + "! Time Freezing.");
             Time.timeScale = 0.01f;
-            isTimeFrozen = true; // Set the static flag
-            Invoke("restartGame", 0.06f); // Restart the game after a short delay
+            isTimeFrozen = true;
+            Invoke("restartGame", 0.06f);
 
-            // Optional: Notify a game manager or trigger a game over sequence
-            if (lawEnforcementManager != null)
-            {
-                // You might want a specific method in lawEnforcementManager for this
-                // e.g., lawEnforcementManager.HandlePlayerCaught();
-            }
-            // Stop this officer's NavMeshAgent immediately
             if (agent != null && agent.isOnNavMesh)
             {
                 agent.isStopped = true;
@@ -298,7 +296,7 @@ public class policeOfficerController : MonoBehaviour
                 {
                     currentState = OfficerState.Searching;
                     hasReachedLKPInCurrentSearch = false; 
-                    if (agent.isOnNavMesh) agent.SetDestination(lastKnownPlayerPosition); // LKP is from when player was not null
+                    if (agent.isOnNavMesh) agent.SetDestination(lastKnownPlayerPosition);
                 }
                 break;
 
@@ -439,7 +437,7 @@ public class policeOfficerController : MonoBehaviour
 
     private void placeProximityMine()
     {
-        if (isTimeFrozen) return; // Don't place mines if time is frozen
+        if (isTimeFrozen) return;
 
         if (proximityMinePrefab != null && proximityMineCount > 0)
         {
@@ -457,9 +455,9 @@ public class policeOfficerController : MonoBehaviour
 
     void placeRadar()
     {
-        if (isTimeFrozen) return; // Don't place mines if time is frozen
+        if (isTimeFrozen) return;
 
-        if (radarPrefab != null && GameObject.FindGameObjectWithTag("radar") == null && lawEnforcementManager.timeSinceRadarSpawned >= lawEnforcementManager.RadarCooldown && lawEnforcementManager.timePassed >= 120)
+        if (radarPrefab != null && GameObject.FindGameObjectWithTag("radar") == null && lawEnforcementManager.timeSinceRadarSpawned >= lawEnforcementManager.RadarCooldown && lawEnforcementManager.timePassed >= 60)
         {
             Vector2 radarPosition = (Vector2)transform.position + Random.insideUnitCircle * 1f;
             Instantiate(radarPrefab, radarPosition, Quaternion.identity);
@@ -496,61 +494,62 @@ public class policeOfficerController : MonoBehaviour
 
     void UpdateFlashlightStatus()
     {
-        if (officerFlashlight != null)
+        if (officerFlashlight == null) return;
+
+        if (isTimeFrozen)
         {
-            if (isTimeFrozen) // Turn off flashlight if time is frozen
-            {
-                 officerFlashlight.enabled = false;
-                 return;
-            }
-            if (player != null)
-            {
-                float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
-                bool shouldBeEnabled = distanceToPlayer <= 30f || currentState == OfficerState.Chasing || currentState == OfficerState.Searching;
-                officerFlashlight.enabled = shouldBeEnabled;
-            }
-            else
-            {
-                officerFlashlight.enabled = false; 
-            }
+            officerFlashlight.enabled = false;
+            return;
+        }
+
+        if (player == null)
+        {
+            officerFlashlight.enabled = false;
+            return;
+        }
+
+        if (currentState == OfficerState.Chasing)
+        {
+            officerFlashlight.enabled = true;
+            officerFlashlight.color = chaseFlashlightColor;
+            officerFlashlight.intensity = originalFlashlightIntensity * chaseFlashlightIntensityMultiplier;
+        }
+        else
+        {
+            officerFlashlight.color = originalFlashlightColor;
+            officerFlashlight.intensity = originalFlashlightIntensity;
+
+            float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
+            bool shouldBeEnabled = distanceToPlayer <= 30f || currentState == OfficerState.Searching;
+            officerFlashlight.enabled = shouldBeEnabled;
         }
     }
     
-    // This OnTriggerStay2D is now purely for vision detection.
-    // The direct touch/capture is handled in CheckForPlayerTouch().
     private void OnTriggerStay2D(Collider2D other)
     {
         if (isTimeFrozen || player == null || lawEnforcementManager == null || !other.CompareTag("Player"))
         {
-            // If time is frozen, no player, no manager, or not the player, do nothing for vision.
-            // Also, if it's the player but vision is already blocked, canSeePlayerCurrentFrame should be false.
-            // Setting canSeePlayerCurrentFrame to false if ray is blocked is handled below.
             return;
         }
 
         Vector2 currentOfficerPos = (Vector2)transform.position;
         Vector2 rayOrigin = currentOfficerPos + raycastOriginOffset;
-        Vector2 playerCenterPos = (Vector2)other.bounds.center; // Using bounds.center for more accuracy
+        Vector2 playerCenterPos = (Vector2)other.bounds.center;
         Vector2 directionToPlayer = (playerCenterPos - rayOrigin).normalized;
         float distanceToPlayerForRay = Vector2.Distance(rayOrigin, playerCenterPos);
 
-        // Don't bother raycasting if distance is virtually zero (already touching, covered by CheckForPlayerTouch)
-        // or if the trigger itself isn't very large. This check is mainly for line of sight.
-        if (distanceToPlayerForRay <= 0.05f) // Very close, likely means direct line of sight
+        if (distanceToPlayerForRay <= 0.05f)
         {
-            // If extremely close, still do the detection logic.
-            // The 'distanceToPlayer <= 0.01f' was removed as touch is separate.
-            // This part handles if they are inside the trigger and very close, unobstructed.
         }
 
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, directionToPlayer, distanceToPlayerForRay, visionObstructingLayers);
 
-        if (hit.collider == null) // No obstruction
+        if (hit.collider == null)
         {
             Debug.DrawRay(rayOrigin, directionToPlayer * distanceToPlayerForRay, Color.green); 
 
             playerController pc = other.GetComponent<playerController>();
-            if (pc != null) // Ensure playerController exists
+            if (pc != null)
             {
                 if (pc.foliageUnder.Count == 0)
                 {
@@ -561,20 +560,12 @@ public class policeOfficerController : MonoBehaviour
                     lawEnforcementManager.ChangeDetectionPercentage(0.25f * Time.deltaTime);
                 }
             }
-            // Only set canSeePlayerCurrentFrame if detection is full.
-            // This prevents officer from "seeing" if detection isn't 100% yet.
             if (lawEnforcementManager.detectionPercentage >= 1f)
             {
                 canSeePlayerCurrentFrame = true;
             }
-            // If detection is not full, they are "aware" but not "seeing" for chase purposes yet.
-            // canSeePlayerCurrentFrame should remain false or be set by other means (e.g. sound)
-            // For this logic, if detection < 1, they don't "see" to initiate chase from vision alone.
-            // However, if they are already chasing, they will continue.
-            // Consider if detection < 1f should set canSeePlayerCurrentFrame = false here if not chasing.
-            // For now, only set to true on full detection.
         }
-        else // Obstruction found
+        else
         {
             Debug.DrawRay(rayOrigin, directionToPlayer * hit.distance, Color.red); 
             canSeePlayerCurrentFrame = false; 
@@ -586,12 +577,9 @@ public class policeOfficerController : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             canSeePlayerCurrentFrame = false; 
-            // Optionally, you might want to slowly decrease detection if the player exits the trigger
-            // if (lawEnforcementManager != null) lawEnforcementManager.ChangeDetectionPercentage(-0.5f * Time.deltaTime); // Example
         }
     }
 
-    // Call this from a Game Manager or UI button to reset the game
     public static void ResetTime()
     {
         Time.timeScale = 1f;
@@ -600,15 +588,12 @@ public class policeOfficerController : MonoBehaviour
 
     void OnDestroy()
     {
-        // Optional: If this officer is destroyed for some reason, ensure invoked methods are cancelled.
         CancelInvoke("placeProximityMine");
+        CancelInvoke("placeRadar");
     }
 
      void OnEnable()
     {
-        // If the object is pooled and re-enabled, ensure time isn't frozen by this instance
-        // (though the static 'isTimeFrozen' handles global state)
-        // and that the NavMeshAgent is correctly configured if it was stopped.
         if (agent != null && agent.isOnNavMesh)
         {
             if (isTimeFrozen) {
@@ -616,6 +601,10 @@ public class policeOfficerController : MonoBehaviour
             } else {
                 agent.isStopped = false;
             }
+        }
+         if (officerFlashlight != null && !isTimeFrozen)
+        {
+           UpdateFlashlightStatus(); // Re-evaluate flashlight state on enable
         }
     }
 }

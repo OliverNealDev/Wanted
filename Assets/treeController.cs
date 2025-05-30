@@ -9,6 +9,8 @@ public class treeController : MonoBehaviour
     private SpriteRenderer treeTopRenderer;
     private SpriteRenderer treeStumpRenderer;
     private Coroutine activeFadeCoroutine;
+    
+    private AudioSource audioSource;
 
     [Tooltip("Duration of the opacity fade in seconds.")]
     public float fadeDuration = 0.25f;
@@ -21,6 +23,7 @@ public class treeController : MonoBehaviour
         
         treeTop = transform.GetChild(1).gameObject;
         treeTopRenderer = treeTop.GetComponent<SpriteRenderer>();
+        audioSource = GetComponent<AudioSource>();
             
         treeStump = transform.GetChild(0).gameObject;
         treeStumpRenderer = treeStump.GetComponent<SpriteRenderer>();
@@ -42,7 +45,12 @@ public class treeController : MonoBehaviour
             {
                 StopCoroutine(activeFadeCoroutine);
             }
-            activeFadeCoroutine = StartCoroutine(FadeOpacity(0.8f));
+            
+            if (audioSource != null && !audioSource.isPlaying)
+            {
+                audioSource.Play();
+            }
+            activeFadeCoroutine = StartCoroutine(FadeOpacity(0.5f));
         }
     }
 

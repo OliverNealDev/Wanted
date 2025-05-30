@@ -32,7 +32,8 @@ public class lawEnforcementManager : MonoBehaviour
     {
         player = GameObject.FindGameObjectWithTag("Player");
         InvokeRepeating("SpawnPoliceCar", 1f, 30.44f);
-        InvokeRepeating("SpawnPoliceHelicopter", 60f, 25.4f);
+        Invoke("SpawnPoliceCar", 3f);
+        InvokeRepeating("SpawnPoliceHelicopter", 30f, 25.4f);
         
         detectionSlider.value = detectionPercentage;
     }
